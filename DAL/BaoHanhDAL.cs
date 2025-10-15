@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
-using System.Data;
 using BaiMoiiii.MODEL;
+using System.Data;
 
 namespace BaiMoiiii.DAL
 {
