@@ -30,6 +30,12 @@ namespace BaiMoiiii.BUS
             return _dal.Update(c);
         }
 
-
+        // Xóa checklist
+        public bool Delete(int id)
+        {
+            if (id <= 0)
+                throw new ArgumentException("Mã checklist không hợp lệ.");
+            return _dal.Delete(id);
+        }
     }
 }
