@@ -31,5 +31,20 @@ namespace BaiMoiiii.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        // ================== CREATE ==================
+        [HttpPost]
+        public IActionResult Add([FromBody] Checklist c)
+        {
+            try
+            {
+                if (_bus.Add(c))
+                    return Ok(new { message = "Thêm checklist thành công!" });
+                return BadRequest(new { message = "Không thể thêm checklist." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

@@ -30,7 +30,20 @@ namespace BaiMoiiii.DAL
                 });
             }
             return list;
-        
         }
+        // ===================== THÊM CHECKLIST =====================
+        public bool Add(Checklist c)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"INSERT INTO Checklist (Ten, MoTa)
+                                   VALUES (@ten, @mota)", conn);
+            cmd.Parameters.AddWithValue("@ten", c.Ten);
+            cmd.Parameters.AddWithValue("@mota", (object?)c.MoTa ?? DBNull.Value);
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+
     }
 }
+
