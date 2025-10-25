@@ -49,28 +49,19 @@ namespace BaiMoiiii.Controllers
         }
 
         // ================== UPDATE ==================
-        [HttpPut("update/{id}")]
-        public IActionResult Update(int id, [FromBody] Checklist c)
+        [HttpPut]
+        public IActionResult Update([FromBody] Checklist c)
         {
-            if (c == null || id != c.MaChecklist)
-                return BadRequest(new { message = "Dữ liệu không hợp lệ hoặc ID không khớp." });
-
             try
             {
-                bool updated = _bus.Update(c);
-                if (!updated)
-                    return NotFound(new { message = $"Không tìm thấy checklist có mã {id} để cập nhật." });
-
-                return Ok(new { message = "Cập nhật checklist thành công!" });
+                if (_bus.Update(c))
+                    return Ok(new { message = "Cập nhật checklist thành công!" });
+                return BadRequest(new { message = "Không thể cập nhật checklist." });
             }
             catch (Exception ex)
             {
-                // Gợi ý: log ra file ở đây nếu cần
-                return StatusCode(500, new { message = "Đã xảy ra lỗi khi cập nhật checklist.", error = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
         }
-
-
-
     }
 }
