@@ -43,6 +43,20 @@ namespace BaiMoiiii.DAL
             return cmd.ExecuteNonQuery() > 0;
         }
 
+        // ===================== CẬP NHẬT CHECKLIST =====================
+        public bool Update(Checklist c)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"UPDATE Checklist 
+                                   SET Ten=@ten, MoTa=@mota 
+                                   WHERE ChecklistID=@id", conn);
+            cmd.Parameters.AddWithValue("@id", c.ChecklistID);
+            cmd.Parameters.AddWithValue("@ten", c.Ten);
+            cmd.Parameters.AddWithValue("@mota", (object?)c.MoTa ?? DBNull.Value);
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
 
     }
 }
