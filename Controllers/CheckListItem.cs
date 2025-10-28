@@ -53,23 +53,15 @@ namespace BaiMoiiii.Controllers
         [HttpPut]
         public IActionResult Update([FromBody] ChecklistItem item)
         {
-            if (item == null)
-                return BadRequest(new { message = "Dữ liệu gửi lên không hợp lệ!" });
-
             try
             {
-                bool updated = _bus.Update(item);
-                return updated
-                    ? Ok(new { message = "✅ Cập nhật mục checklist thành công!" })
-                    : NotFound(new { message = "Không tìm thấy mục checklist để cập nhật." });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
+                if (_bus.Update(item))
+                    return Ok(new { message = "Cập nhật mục checklist thành công!" });
+                return BadRequest(new { message = "Không thể cập nhật mục checklist." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi máy chủ!", error = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
         }
 
