@@ -54,6 +54,7 @@ namespace BaiMoiiii.DAL
             return null;
         }
 
+
         public bool Add(KhachHang kh)
         {
             using SqlConnection conn = new(_conn);

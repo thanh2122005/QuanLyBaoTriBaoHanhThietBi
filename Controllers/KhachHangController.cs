@@ -30,7 +30,8 @@ namespace BaiMoiiii.Controllers
             }
         }
 
-        // ===================== GET BY ID =====================
+
+        // ===================== GET BY ID ====================
         [HttpGet("get/{id}")]
         public IActionResult GetById(int id)
         {
@@ -48,7 +49,7 @@ namespace BaiMoiiii.Controllers
         }
 
 
-        // ===================== ADD =====================
+        // ===================== ADD ====================
         [HttpPost("create")]
         public IActionResult Add([FromBody] KhachHang kh)
         {
@@ -64,7 +65,7 @@ namespace BaiMoiiii.Controllers
             }
         }
 
-        // ===================== UPDATE =====================
+        // ===================== UPDATE ====================
         [HttpPut("update")]
         public IActionResult Update([FromBody] KhachHang kh)
         {
@@ -80,7 +81,7 @@ namespace BaiMoiiii.Controllers
             }
         }
 
-        // ===================== DELETE =====================
+        // ===================== DELETE ====================
         [HttpDelete("delete/{id}")]
         public IActionResult Delete(int id)
         {

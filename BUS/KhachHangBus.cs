@@ -12,14 +12,10 @@ namespace BaiMoiiii.BUS
             _dal = new KhachHangDAL(config);
         }
 
-        // =====================================================
-        // 🔹 LẤY DANH SÁCH KHÁCH HÀNG
-        // =====================================================
+        // LẤY DANH SÁCH KHÁCH HÀNG
         public List<KhachHang> GetAll() => _dal.GetAll();
 
-        // =====================================================
-        // 🔹 LẤY THEO ID
-        // =====================================================
+        // LẤY THEO ID
         public KhachHang? GetById(int id)
         {
             if (id <= 0)
@@ -27,9 +23,7 @@ namespace BaiMoiiii.BUS
             return _dal.GetById(id);
         }
 
-        // =====================================================
-        // 🔹 THÊM KHÁCH HÀNG MỚI
-        // =====================================================
+        // THÊM KHÁCH HÀNG MỚI
         public bool Add(KhachHang kh)
         {
             if (string.IsNullOrWhiteSpace(kh.TenKH))
@@ -38,9 +32,7 @@ namespace BaiMoiiii.BUS
             return _dal.Add(kh);
         }
 
-        // =====================================================
-        // 🔹 CẬP NHẬT KHÁCH HÀNG
-        // =====================================================
+        // CẬP NHẬT KHÁCH HÀNG
         public bool Update(KhachHang kh)
         {
             if (kh.MaKH <= 0)
@@ -51,10 +43,7 @@ namespace BaiMoiiii.BUS
 
             return _dal.Update(kh);
         }
-
-        // =====================================================
-        // 🔹 XÓA KHÁCH HÀNG
-        // =====================================================
+        //XÓA KHÁCH HÀNG
         public bool Delete(int id)
         {
             if (id <= 0)
