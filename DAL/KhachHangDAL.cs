@@ -54,6 +54,20 @@ namespace BaiMoiiii.DAL
             return null;
         }
 
+        public bool Add(KhachHang kh)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"INSERT INTO KhachHang (TenKH, Email, DienThoai, DiaChi)
+                                   VALUES (@ten, @email, @sdt, @diachi)", conn);
+            cmd.Parameters.AddWithValue("@ten", kh.TenKH);
+            cmd.Parameters.AddWithValue("@email", (object?)kh.Email ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@sdt", (object?)kh.DienThoai ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@diachi", (object?)kh.DiaChi ?? DBNull.Value);
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+
 
     }
 }

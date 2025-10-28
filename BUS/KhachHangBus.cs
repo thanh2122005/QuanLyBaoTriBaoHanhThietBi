@@ -27,5 +27,15 @@ namespace BaiMoiiii.BUS
             return _dal.GetById(id);
         }
 
+        // =====================================================
+        // 🔹 THÊM KHÁCH HÀNG MỚI
+        // =====================================================
+        public bool Add(KhachHang kh)
+        {
+            if (string.IsNullOrWhiteSpace(kh.TenKH))
+                throw new ArgumentException("Tên khách hàng không được để trống.");
+
+            return _dal.Add(kh);
+        }
     }
 }

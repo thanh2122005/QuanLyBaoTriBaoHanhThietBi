@@ -48,5 +48,23 @@ namespace BaiMoiiii.Controllers
         }
 
 
+        // ===================== ADD =====================
+        [HttpPost("create")]
+        public IActionResult Add([FromBody] KhachHang kh)
+        {
+            try
+            {
+                if (_bus.Add(kh))
+                    return Ok(new { message = "Thêm khách hàng thành công!" });
+                return BadRequest(new { message = "Không thể thêm khách hàng." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+
     }
 }
