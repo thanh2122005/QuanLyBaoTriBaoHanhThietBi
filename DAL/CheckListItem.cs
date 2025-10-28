@@ -59,5 +59,15 @@ namespace BaiMoiiii.DAL
             return cmd.ExecuteNonQuery() > 0;
         }
 
+        // ===================== XÓA =====================
+        public bool Delete(int id)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new("DELETE FROM ChecklistItem WHERE ItemID=@id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
     }
 }

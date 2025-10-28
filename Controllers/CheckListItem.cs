@@ -74,5 +74,20 @@ namespace BaiMoiiii.Controllers
         }
 
 
+        // ===================== DELETE =====================
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                if (_bus.Delete(id))
+                    return Ok(new { message = "Xóa mục checklist thành công!" });
+                return BadRequest(new { message = "Không thể xóa mục checklist." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
