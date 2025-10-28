@@ -80,7 +80,21 @@ namespace BaiMoiiii.Controllers
             }
         }
 
-
+        // ===================== DELETE =====================
+        [HttpDelete("delete/{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                if (_bus.Delete(id))
+                    return Ok(new { message = "Xóa khách hàng thành công!" });
+                return BadRequest(new { message = "Không thể xóa khách hàng." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
     }
 }

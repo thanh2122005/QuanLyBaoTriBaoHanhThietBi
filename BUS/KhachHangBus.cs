@@ -51,5 +51,15 @@ namespace BaiMoiiii.BUS
 
             return _dal.Update(kh);
         }
+
+        // =====================================================
+        // 🔹 XÓA KHÁCH HÀNG
+        // =====================================================
+        public bool Delete(int id)
+        {
+            if (id <= 0)
+                throw new ArgumentException("Mã khách hàng không hợp lệ.");
+            return _dal.Delete(id);
+        }
     }
 }
