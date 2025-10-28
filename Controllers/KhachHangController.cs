@@ -64,6 +64,22 @@ namespace BaiMoiiii.Controllers
             }
         }
 
+        // ===================== UPDATE =====================
+        [HttpPut("update")]
+        public IActionResult Update([FromBody] KhachHang kh)
+        {
+            try
+            {
+                if (_bus.Update(kh))
+                    return Ok(new { message = "Cập nhật khách hàng thành công!" });
+                return BadRequest(new { message = "Không thể cập nhật khách hàng." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
 
 
     }

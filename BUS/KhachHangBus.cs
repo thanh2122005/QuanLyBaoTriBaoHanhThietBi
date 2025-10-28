@@ -37,5 +37,19 @@ namespace BaiMoiiii.BUS
 
             return _dal.Add(kh);
         }
+
+        // =====================================================
+        // 🔹 CẬP NHẬT KHÁCH HÀNG
+        // =====================================================
+        public bool Update(KhachHang kh)
+        {
+            if (kh.MaKH <= 0)
+                throw new ArgumentException("Mã khách hàng không hợp lệ.");
+
+            if (string.IsNullOrWhiteSpace(kh.TenKH))
+                throw new ArgumentException("Tên khách hàng không được để trống.");
+
+            return _dal.Update(kh);
+        }
     }
 }
