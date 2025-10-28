@@ -34,5 +34,18 @@ namespace BaiMoiiii.DAL
         }
 
 
+        // ===================== THÊM =====================
+        public bool Add(ChecklistItem item)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"INSERT INTO ChecklistItem (ChecklistID, NoiDung)
+                                   VALUES (@cid, @nd)", conn);
+            cmd.Parameters.AddWithValue("@cid", item.ChecklistID);
+            cmd.Parameters.AddWithValue("@nd", item.NoiDung);
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+
     }
 }

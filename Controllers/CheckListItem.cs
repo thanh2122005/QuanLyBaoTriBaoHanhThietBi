@@ -33,6 +33,22 @@ namespace BaiMoiiii.Controllers
             }
         }
 
+        // ===================== ADD =====================
+        [HttpPost]
+        public IActionResult Add([FromBody] ChecklistItem item)
+        {
+            try
+            {
+                if (_bus.Add(item))
+                    return Ok(new { message = "Thêm mục checklist thành công!" });
+                return BadRequest(new { message = "Không thể thêm mục checklist." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
 
     }
 }
