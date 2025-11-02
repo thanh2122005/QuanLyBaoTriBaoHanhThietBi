@@ -1,24 +1,54 @@
-﻿using BaiMoiiii.DAL;
-using BaiMoiiii.BUS;
+﻿using BaiMoiiii.BUS;
+using BaiMoiiii.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ===== DỊCH VỤ CƠ BẢN =====
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ==================== 🔹 ĐĂNG KÝ LỚP DAL + BUS ====================
-builder.Services.AddSingleton(new BaoHanhDAL(
-    builder.Configuration.GetConnectionString("DefaultConnection")!
-));
-builder.Services.AddScoped<BaoHanhBUS>();
+// ===== CẤU HÌNH CORS =====
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins, policy =>
+    {
+        policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
-// ================================================================
+// ===== KẾT NỐI CHUỖI CSDL =====
+var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// =====================================================
+// 🧩 ĐĂNG KÝ DAL & BUS (ADO.NET)
+// =====================================================
+
+// ♦ BẢO HÀNH
+builder.Services.AddSingleton(new BaoHanhDAL(connStr));
+builder.Services.AddScoped<BaoHanhBUS>(_ => new BaoHanhBUS(connStr));
+
+// ♦ KHÁCH HÀNG
+builder.Services.AddSingleton(new KhachHangDAL(connStr));
+builder.Services.AddScoped<KhachHangBUS>(_ => new KhachHangBUS(connStr));
+
+// ♦ TÀI SẢN
+builder.Services.AddSingleton(new TaiSanDAL(connStr));
+builder.Services.AddScoped<TaiSanBUS>(_ => new TaiSanBUS(connStr));
+
+// ⚙️ Bạn có thể thêm module khác tương tự:
+// builder.Services.AddSingleton(new NhanVienDAL(connStr));
+// builder.Services.AddScoped<NhanVienBUS>(_ => new NhanVienBUS(connStr));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// =====================================================
+// 🧩 MIDDLEWARE PIPELINE
+// =====================================================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -26,6 +56,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(MyAllowSpecificOrigins); // ⚠️ BẮT BUỘC để FE (HTML/JS) truy cập được
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();

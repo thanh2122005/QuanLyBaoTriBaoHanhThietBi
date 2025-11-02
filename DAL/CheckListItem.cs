@@ -33,7 +33,6 @@ namespace BaiMoiiii.DAL
             return list;
         }
 
-
         // ===================== THÊM =====================
         public bool Add(ChecklistItem item)
         {
@@ -46,6 +45,27 @@ namespace BaiMoiiii.DAL
             return cmd.ExecuteNonQuery() > 0;
         }
 
+        // ===================== CẬP NHẬT =====================
+        public bool Update(ChecklistItem item)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"UPDATE ChecklistItem 
+                                   SET NoiDung=@nd 
+                                   WHERE ItemID=@id", conn);
+            cmd.Parameters.AddWithValue("@id", item.ItemID);
+            cmd.Parameters.AddWithValue("@nd", item.NoiDung);
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
 
+        // ===================== XÓA =====================
+        public bool Delete(int id)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new("DELETE FROM ChecklistItem WHERE ItemID=@id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
     }
 }

@@ -26,6 +26,18 @@ namespace BaiMoiiii.BUS
             return _dal.Add(item);
         }
 
+        public bool Update(ChecklistItem item)
+        {
+            if (item.ItemID <= 0)
+                throw new ArgumentException("Mã item không hợp lệ.");
+            return _dal.Update(item);
+        }
 
+        public bool Delete(int id)
+        {
+            if (id <= 0)
+                throw new ArgumentException("Mã item không hợp lệ.");
+            return _dal.Delete(id);
+        }
     }
 }

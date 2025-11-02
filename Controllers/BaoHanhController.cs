@@ -15,85 +15,65 @@ namespace BaiMoiiii.API.Controllers
             _bus = bus;
         }
 
-        // 🔹 GET: api/BaoHanh/get-all
+        // ================== GET ALL ==================
         [HttpGet("get-all")]
         public IActionResult GetAll()
         {
             var list = _bus.GetAll();
             if (list == null || !list.Any())
-                return NotFound(new { message = "Không có dữ liệu bảo hành nào." });
-
-            return Ok(new
-            {
-                message = "Lấy danh sách bảo hành thành công!",
-                data = list
-            });
+                return NotFound(new { message = "Không có dữ liệu." });
+            return Ok(list);
         }
 
-        // 🔹 GET: api/BaoHanh/get/{id}
+        // ================== GET BY ID ==================
         [HttpGet("get/{id}")]
         public IActionResult GetById(int id)
         {
             var item = _bus.GetById(id);
             if (item == null)
-                return NotFound(new { message = $"Không tìm thấy bảo hành có ID = {id}" });
-
-            return Ok(new
-            {
-                message = "Lấy thông tin bảo hành thành công!",
-                data = item
-            });
+                return NotFound(new { message = "Không tìm thấy bản ghi." });
+            return Ok(item);
         }
 
-        // 🔹 POST: api/BaoHanh/create
-        [HttpPost("create")]
-        public IActionResult Create([FromBody] BaoHanh bh)
+        // ================== CREATE ==================
+        [HttpPost]
+        public IActionResult Create([FromBody] BaoHanh model)
         {
-            if (bh == null)
-                return BadRequest(new { message = "Dữ liệu bảo hành không hợp lệ." });
+            if (model == null)
+                return BadRequest(new { message = "Dữ liệu không hợp lệ." });
 
-            var result = _bus.Create(bh);
-            if (!result)
-                return StatusCode(500, new { message = "Không thể thêm bảo hành mới!" });
+            var result = _bus.Add(model);
 
-            return Ok(new
-            {
-                message = "Thêm mới bảo hành thành công!",
-                data = bh
-            });
+            if (result)
+                return Ok(new { message = "Thêm bảo hành thành công!" });
+
+            return BadRequest(new { message = "Thêm bảo hành thất bại!" });
         }
 
-        // 🔹 PUT: api/BaoHanh/update/{id}
-        [HttpPut("update/{id}")]
-        public IActionResult Update(int id, [FromBody] BaoHanh bh)
+        // ================== UPDATE ==================
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody] BaoHanh model)
         {
-            if (bh == null || id != bh.MaBaoHanh)
-                return BadRequest(new { message = "ID không hợp lệ hoặc dữ liệu bị thiếu." });
+            if (model == null)
+                return BadRequest(new { message = "Dữ liệu không hợp lệ." });
 
-            var result = _bus.Update(bh);
-            if (!result)
-                return NotFound(new { message = $"Không thể cập nhật bảo hành có ID = {id}" });
+            model.MaBaoHanh = id;
+            var result = _bus.Update(model);
+            if (result)
+                return Ok(new { message = "Cập nhật bảo hành thành công!" });
 
-            return Ok(new
-            {
-                message = "Cập nhật thông tin bảo hành thành công!",
-                data = bh
-            });
+            return BadRequest(new { message = "Cập nhật thất bại!" });
         }
 
-        // 🔹 DELETE: api/BaoHanh/delete/{id}
-        [HttpDelete("delete/{id}")]
+        // ================== DELETE ==================
+        [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             var result = _bus.Delete(id);
-            if (!result)
-                return NotFound(new { message = $"Không tìm thấy bảo hành có ID = {id}" });
+            if (result)
+                return Ok(new { message = "Xóa bảo hành thành công!" });
 
-            return Ok(new
-            {
-                message = "Xóa bảo hành thành công!",
-                id
-            });
+            return BadRequest(new { message = "Xóa thất bại!" });
         }
     }
 }

@@ -31,6 +31,7 @@ namespace BaiMoiiii.DAL
             }
             return list;
         }
+
         // ===================== THÊM CHECKLIST =====================
         public bool Add(Checklist c)
         {
@@ -68,4 +69,3 @@ namespace BaiMoiiii.DAL
         }
     }
 }
-
