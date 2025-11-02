@@ -66,5 +66,31 @@ namespace BaiMoiiii.DAL
             }
             return null;
         }
+
+        // ==================== ADD ====================
+        public bool Add(LichBaoTri l)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"
+                INSERT INTO LichBaoTri 
+                    (MaTaiSan, MaNV, TanSuat, SoNgayLapLai, NgayKeTiep, ChecklistMacDinh, HieuLuc)
+                VALUES 
+                    (@MaTaiSan, @MaNV, @TanSuat, @SoNgayLapLai, @NgayKeTiep, @ChecklistMacDinh, @HieuLuc)", conn);
+
+            cmd.Parameters.AddWithValue("@MaTaiSan", l.MaTaiSan);
+            cmd.Parameters.AddWithValue("@MaNV", (object?)l.MaNV ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@TanSuat", l.TanSuat);
+            cmd.Parameters.AddWithValue("@SoNgayLapLai", (object?)l.SoNgayLapLai ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@NgayKeTiep", l.NgayKeTiep);
+            cmd.Parameters.AddWithValue("@ChecklistMacDinh", (object?)l.ChecklistMacDinh ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@HieuLuc", l.HieuLuc);
+
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+
+
+
     }
 }

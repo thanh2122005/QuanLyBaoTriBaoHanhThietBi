@@ -33,6 +33,20 @@ namespace BaiMoiiii.API.Controllers
             return Ok(item);
         }
 
-   
+        [HttpPost("create")]
+        public IActionResult Create([FromBody] LichBaoTri model)
+        {
+            try
+            {
+                if (_bus.Add(model))
+                    return Ok(new { message = "Thêm lịch bảo trì thành công!" });
+                return BadRequest(new { message = "Thêm thất bại." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
     }
 }
