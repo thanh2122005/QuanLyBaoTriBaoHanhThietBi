@@ -75,5 +75,25 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
+
+        // ==================== UPDATE ====================
+        public bool Update(LinhKien lk)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"
+                UPDATE LinhKien
+                SET TenLinhKien=@TenLinhKien, MaSo=@MaSo, TonKho=@TonKho
+                WHERE MaLinhKien=@MaLinhKien", conn);
+
+            cmd.Parameters.AddWithValue("@MaLinhKien", lk.MaLinhKien);
+            cmd.Parameters.AddWithValue("@TenLinhKien", lk.TenLinhKien);
+            cmd.Parameters.AddWithValue("@MaSo", (object?)lk.MaSo ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@TonKho", lk.TonKho);
+
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+
     }
 }

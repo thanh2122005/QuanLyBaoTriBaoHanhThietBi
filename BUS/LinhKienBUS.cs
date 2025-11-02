@@ -22,5 +22,12 @@ namespace BaiMoiiii.BUS
             return _dal.Add(lk);
         }
 
+        public bool Update(LinhKien lk)
+        {
+            if (lk.MaLinhKien <= 0)
+                throw new ArgumentException("Mã linh kiện không hợp lệ.");
+            return _dal.Update(lk);
+        }
+
     }
 }

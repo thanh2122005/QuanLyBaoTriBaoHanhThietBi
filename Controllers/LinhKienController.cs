@@ -51,5 +51,22 @@ namespace BaiMoiiii.API.Controllers
             }
         }
 
+        // ===================== UPDATE =====================
+        [HttpPut("update/{id}")]
+        public IActionResult Update(int id, [FromBody] LinhKien model)
+        {
+            try
+            {
+                model.MaLinhKien = id;
+                if (_bus.Update(model))
+                    return Ok(new { message = "Cập nhật thành công!" });
+                return NotFound(new { message = "Không tìm thấy linh kiện cần cập nhật." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
     }
 }
