@@ -68,5 +68,20 @@ namespace BaiMoiiii.API.Controllers
             }
         }
 
+        // ===================== DELETE =====================
+        [HttpDelete("delete/{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                if (_bus.Delete(id))
+                    return Ok(new { message = "Xóa linh kiện thành công!" });
+                return NotFound(new { message = "Không tìm thấy linh kiện để xóa." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }

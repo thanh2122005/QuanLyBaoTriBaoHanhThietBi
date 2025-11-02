@@ -29,5 +29,11 @@ namespace BaiMoiiii.BUS
             return _dal.Update(lk);
         }
 
+        public bool Delete(int id)
+        {
+            if (id <= 0)
+                throw new ArgumentException("Mã linh kiện không hợp lệ.");
+            return _dal.Delete(id);
+        }
     }
 }
