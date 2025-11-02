@@ -113,7 +113,15 @@ namespace BaiMoiiii.DAL
             return cmd.ExecuteNonQuery() > 0;
         }
 
-
+        // ==================== DELETE ====================
+        public bool Delete(int id)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new("DELETE FROM LichBaoTri WHERE MaLich=@id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
 
 
     }
