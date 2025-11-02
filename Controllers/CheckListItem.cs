@@ -49,6 +49,37 @@ namespace BaiMoiiii.Controllers
             }
         }
 
+        // ===================== UPDATE =====================
+        [HttpPut]
+        public IActionResult Update([FromBody] ChecklistItem item)
+        {
+            try
+            {
+                if (_bus.Update(item))
+                    return Ok(new { message = "Cập nhật mục checklist thành công!" });
+                return BadRequest(new { message = "Không thể cập nhật mục checklist." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
+
+        // ===================== DELETE =====================
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                if (_bus.Delete(id))
+                    return Ok(new { message = "Xóa mục checklist thành công!" });
+                return BadRequest(new { message = "Không thể xóa mục checklist." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
