@@ -15,6 +15,12 @@ namespace BaiMoiiii.BUS
 
         public LinhKien? GetById(int id) => _dal.GetById(id);
 
+        public bool Add(LinhKien lk)
+        {
+            if (string.IsNullOrWhiteSpace(lk.TenLinhKien))
+                throw new ArgumentException("Tên linh kiện không được để trống.");
+            return _dal.Add(lk);
+        }
 
     }
 }

@@ -35,6 +35,21 @@ namespace BaiMoiiii.API.Controllers
             return Ok(lk);
         }
 
+        // ===================== CREATE =====================
+        [HttpPost("create")]
+        public IActionResult Create([FromBody] LinhKien model)
+        {
+            try
+            {
+                if (_bus.Add(model))
+                    return Ok(new { message = "Thêm linh kiện thành công!" });
+                return BadRequest(new { message = "Thêm thất bại!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
 
     }
 }

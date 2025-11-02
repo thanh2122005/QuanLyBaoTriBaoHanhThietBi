@@ -60,5 +60,20 @@ namespace BaiMoiiii.DAL
             return null;
         }
 
+        // ==================== ADD ====================
+        public bool Add(LinhKien lk)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"
+                INSERT INTO LinhKien (TenLinhKien, MaSo, TonKho)
+                VALUES (@TenLinhKien, @MaSo, @TonKho)", conn);
+
+            cmd.Parameters.AddWithValue("@TenLinhKien", lk.TenLinhKien);
+            cmd.Parameters.AddWithValue("@MaSo", (object?)lk.MaSo ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@TonKho", lk.TonKho);
+
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
     }
 }
