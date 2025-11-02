@@ -14,6 +14,51 @@ namespace BaiMoiiii.DAL
             _conn = config.GetConnectionString("DefaultConnection");
         }
 
+        // ==================== GET ALL ====================
+        public List<LinhKien> GetAll()
+        {
+            var list = new List<LinhKien>();
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new("SELECT * FROM LinhKien", conn);
+            conn.Open();
+
+            SqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                list.Add(new LinhKien
+                {
+                    MaLinhKien = Convert.ToInt32(dr["MaLinhKien"]),
+                    TenLinhKien = dr["TenLinhKien"].ToString(),
+                    MaSo = dr["MaSo"] == DBNull.Value ? null : dr["MaSo"].ToString(),
+                    TonKho = Convert.ToInt32(dr["TonKho"])
+                });
+            }
+
+            return list;
+        }
+
+        // ==================== GET BY ID ====================
+        public LinhKien? GetById(int id)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new("SELECT * FROM LinhKien WHERE MaLinhKien=@id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            conn.Open();
+
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr.Read())
+            {
+                return new LinhKien
+                {
+                    MaLinhKien = Convert.ToInt32(dr["MaLinhKien"]),
+                    TenLinhKien = dr["TenLinhKien"].ToString(),
+                    MaSo = dr["MaSo"] == DBNull.Value ? null : dr["MaSo"].ToString(),
+                    TonKho = Convert.ToInt32(dr["TonKho"])
+                };
+            }
+
+            return null;
+        }
 
     }
 }
