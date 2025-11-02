@@ -89,6 +89,30 @@ namespace BaiMoiiii.DAL
             return cmd.ExecuteNonQuery() > 0;
         }
 
+        // ==================== UPDATE ====================
+        public bool Update(LichBaoTri l)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"
+                UPDATE LichBaoTri
+                SET MaTaiSan=@MaTaiSan, MaNV=@MaNV, TanSuat=@TanSuat,
+                    SoNgayLapLai=@SoNgayLapLai, NgayKeTiep=@NgayKeTiep,
+                    ChecklistMacDinh=@ChecklistMacDinh, HieuLuc=@HieuLuc
+                WHERE MaLich=@MaLich", conn);
+
+            cmd.Parameters.AddWithValue("@MaLich", l.MaLich);
+            cmd.Parameters.AddWithValue("@MaTaiSan", l.MaTaiSan);
+            cmd.Parameters.AddWithValue("@MaNV", (object?)l.MaNV ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@TanSuat", l.TanSuat);
+            cmd.Parameters.AddWithValue("@SoNgayLapLai", (object?)l.SoNgayLapLai ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@NgayKeTiep", l.NgayKeTiep);
+            cmd.Parameters.AddWithValue("@ChecklistMacDinh", (object?)l.ChecklistMacDinh ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@HieuLuc", l.HieuLuc);
+
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
 
 
 

@@ -48,5 +48,23 @@ namespace BaiMoiiii.API.Controllers
             }
         }
 
+
+        [HttpPut("update/{id}")]
+        public IActionResult Update(int id, [FromBody] LichBaoTri model)
+        {
+            try
+            {
+                model.MaLich = id;
+                if (_bus.Update(model))
+                    return Ok(new { message = "Cập nhật thành công!" });
+                return NotFound(new { message = "Không tìm thấy bản ghi cần cập nhật." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
     }
 }

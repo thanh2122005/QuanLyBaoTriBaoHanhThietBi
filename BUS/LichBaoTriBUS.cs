@@ -23,6 +23,12 @@ namespace BaiMoiiii.BUS
             return _dal.Add(l);
         }
 
+        public bool Update(LichBaoTri l)
+        {
+            if (l.MaLich <= 0)
+                throw new ArgumentException("Mã lịch không hợp lệ.");
+            return _dal.Update(l);
+        }
 
 
     }
