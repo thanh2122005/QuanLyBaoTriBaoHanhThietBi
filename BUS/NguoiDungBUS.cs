@@ -17,5 +17,13 @@ namespace BaiMoiiii.BUS
         public List<NguoiDung> GetByRole(int roleId) => _dal.GetByRole(roleId);
         public NguoiDung? GetByUsername(string username) => _dal.GetByUsername(username);
 
+        public bool Add(NguoiDung nd)
+        {
+            if (string.IsNullOrWhiteSpace(nd.TenDangNhap))
+                throw new ArgumentException("Tên đăng nhập không được để trống.");
+            if (string.IsNullOrWhiteSpace(nd.MatKhauHash))
+                throw new ArgumentException("Mật khẩu không được để trống.");
+            return _dal.Add(nd);
+        }
     }
 }

@@ -69,6 +69,32 @@ namespace BaiMoiiii.DAL
             return null;
         }
 
+        // =================== ADD ===================
+        public bool Add(NguoiDung nd)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"
+                INSERT INTO NguoiDung 
+                    (TenDangNhap, MatKhauHash, Email, MaNV, VaiTroID, TrangThai, NgayTao, LanDangNhapCuoi)
+                VALUES
+                    (@TenDangNhap, @MatKhauHash, @Email, @MaNV, @VaiTroID, @TrangThai, @NgayTao, @LanDangNhapCuoi)", conn);
 
+            cmd.Parameters.AddWithValue("@TenDangNhap", nd.TenDangNhap);
+            cmd.Parameters.AddWithValue("@MatKhauHash", nd.MatKhauHash);
+            cmd.Parameters.AddWithValue("@Email", (object?)nd.Email ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@MaNV", (object?)nd.MaNV ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@VaiTroID", nd.VaiTroID);
+            cmd.Parameters.AddWithValue("@TrangThai", nd.TrangThai);
+            cmd.Parameters.AddWithValue("@NgayTao", nd.NgayTao);
+            cmd.Parameters.AddWithValue("@LanDangNhapCuoi", (object?)nd.LanDangNhapCuoi ?? DBNull.Value);
+
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+        internal NguoiDung? GetByUsername(string username)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

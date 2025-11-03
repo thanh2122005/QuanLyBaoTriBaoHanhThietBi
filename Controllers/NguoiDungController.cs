@@ -33,5 +33,20 @@ namespace BaiMoiiii.API.Controllers
             return Ok(user);
         }
 
+        [HttpPost("create")]
+        public IActionResult Create([FromBody] NguoiDung model)
+        {
+            try
+            {
+                if (_bus.Add(model))
+                    return Ok(new { message = "Thêm người dùng thành công!" });
+                return BadRequest(new { message = "Thêm thất bại!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
     }
 }
