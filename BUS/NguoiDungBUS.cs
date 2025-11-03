@@ -32,5 +32,11 @@ namespace BaiMoiiii.BUS
             return _dal.Update(nd);
         }
 
+        public bool Delete(int id)
+        {
+            if (id <= 0)
+                throw new ArgumentException("Mã người dùng không hợp lệ.");
+            return _dal.Delete(id);
+        }
     }
 }

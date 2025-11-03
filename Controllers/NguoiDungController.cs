@@ -64,5 +64,22 @@ namespace BaiMoiiii.API.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        [HttpDelete("delete/{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                if (_bus.Delete(id))
+                    return Ok(new { message = "Xóa người dùng thành công!" });
+                return NotFound(new { message = "Không tìm thấy người dùng để xóa." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
     }
 }
