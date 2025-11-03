@@ -25,5 +25,12 @@ namespace BaiMoiiii.BUS
                 throw new ArgumentException("Mật khẩu không được để trống.");
             return _dal.Add(nd);
         }
+        public bool Update(NguoiDung nd)
+        {
+            if (nd.MaNguoiDung <= 0)
+                throw new ArgumentException("Mã người dùng không hợp lệ.");
+            return _dal.Update(nd);
+        }
+
     }
 }

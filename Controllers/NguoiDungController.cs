@@ -48,5 +48,21 @@ namespace BaiMoiiii.API.Controllers
             }
         }
 
+
+        [HttpPut("update/{id}")]
+        public IActionResult Update(int id, [FromBody] NguoiDung model)
+        {
+            try
+            {
+                model.MaNguoiDung = id;
+                if (_bus.Update(model))
+                    return Ok(new { message = "Cập nhật thành công!" });
+                return NotFound(new { message = "Không tìm thấy người dùng cần cập nhật." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }

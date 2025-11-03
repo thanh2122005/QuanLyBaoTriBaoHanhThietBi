@@ -92,9 +92,29 @@ namespace BaiMoiiii.DAL
             return cmd.ExecuteNonQuery() > 0;
         }
 
-        internal NguoiDung? GetByUsername(string username)
+        // =================== UPDATE ===================
+        public bool Update(NguoiDung nd)
         {
-            throw new NotImplementedException();
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"
+                UPDATE NguoiDung
+                SET TenDangNhap=@TenDangNhap, MatKhauHash=@MatKhauHash, Email=@Email,
+                    MaNV=@MaNV, VaiTroID=@VaiTroID, TrangThai=@TrangThai,
+                    LanDangNhapCuoi=@LanDangNhapCuoi
+                WHERE MaNguoiDung=@MaNguoiDung", conn);
+
+            cmd.Parameters.AddWithValue("@MaNguoiDung", nd.MaNguoiDung);
+            cmd.Parameters.AddWithValue("@TenDangNhap", nd.TenDangNhap);
+            cmd.Parameters.AddWithValue("@MatKhauHash", nd.MatKhauHash);
+            cmd.Parameters.AddWithValue("@Email", (object?)nd.Email ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@MaNV", (object?)nd.MaNV ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@VaiTroID", nd.VaiTroID);
+            cmd.Parameters.AddWithValue("@TrangThai", nd.TrangThai);
+            cmd.Parameters.AddWithValue("@LanDangNhapCuoi", (object?)nd.LanDangNhapCuoi ?? DBNull.Value);
+
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
         }
+
     }
 }
