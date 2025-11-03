@@ -7,177 +7,140 @@ namespace BaiMoiiii.DAL
 {
     public class PhieuSuCoDAL
     {
-        private readonly string _conn;
+        private readonly string _connStr;
 
-        public PhieuSuCoDAL(IConfiguration config)
+        public PhieuSuCoDAL(string connStr)
         {
-            _conn = config.GetConnectionString("DefaultConnection");
+            _connStr = connStr;
         }
 
-        // ===================== GET ALL =====================
+        // ========== Lấy tất cả ==========
         public List<PhieuSuCo> GetAll()
         {
             var list = new List<PhieuSuCo>();
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"
-                SELECT s.*, t.TenTaiSan, k.TenKH AS TenKhachHang, nv.HoTen AS TenNhanVien
-                FROM PhieuSuCo s
-                LEFT JOIN TaiSan t ON s.MaTaiSan = t.MaTaiSan
-                LEFT JOIN KhachHang k ON s.MaKH = k.MaKH
-                LEFT JOIN NhanVien nv ON s.MaNV_TiepNhan = nv.MaNV
-                ORDER BY s.NgayTao DESC", conn);
+            string sql = @"
+                SELECT p.*, t.TenTaiSan 
+                FROM PhieuSuCo p
+                LEFT JOIN TaiSan t ON p.MaTaiSan = t.MaTaiSan
+                ORDER BY p.MaSuCo DESC";
 
-            conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            while (dr.Read())
+            using (var conn = new SqlConnection(_connStr))
             {
-                list.Add(MapToPhieuSuCo(dr));
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new PhieuSuCo
+                        {
+                            MaSuCo = (int)reader["MaSuCo"],
+                            MaTaiSan = (int)reader["MaTaiSan"],
+                            TenTaiSan = reader["TenTaiSan"]?.ToString(),
+                            MoTa = reader["MoTa"]?.ToString(),
+                            MucDo = reader["MucDo"].ToString(),
+                            NgayBaoCao = (DateTime)reader["NgayBaoCao"],
+                            TrangThai = reader["TrangThai"].ToString()
+                        });
+                    }
+                }
             }
             return list;
         }
 
-        // ===================== GET BY ID =====================
+        // ========== Lấy theo ID ==========
         public PhieuSuCo? GetById(int id)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"
-                SELECT s.*, t.TenTaiSan, k.TenKH AS TenKhachHang, nv.HoTen AS TenNhanVien
-                FROM PhieuSuCo s
-                LEFT JOIN TaiSan t ON s.MaTaiSan = t.MaTaiSan
-                LEFT JOIN KhachHang k ON s.MaKH = k.MaKH
-                LEFT JOIN NhanVien nv ON s.MaNV_TiepNhan = nv.MaNV
-                WHERE s.MaSuCo = @id", conn);
+            PhieuSuCo? item = null;
+            string sql = @"
+                SELECT p.*, t.TenTaiSan 
+                FROM PhieuSuCo p
+                LEFT JOIN TaiSan t ON p.MaTaiSan = t.MaTaiSan
+                WHERE p.MaSuCo = @id";
 
-            cmd.Parameters.AddWithValue("@id", id);
-            conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            return dr.Read() ? MapToPhieuSuCo(dr) : null;
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            item = new PhieuSuCo
+                            {
+                                MaSuCo = (int)reader["MaSuCo"],
+                                MaTaiSan = (int)reader["MaTaiSan"],
+                                TenTaiSan = reader["TenTaiSan"]?.ToString(),
+                                MoTa = reader["MoTa"]?.ToString(),
+                                MucDo = reader["MucDo"].ToString(),
+                                NgayBaoCao = (DateTime)reader["NgayBaoCao"],
+                                TrangThai = reader["TrangThai"].ToString()
+                            };
+                        }
+                    }
+                }
+            }
+            return item;
         }
 
-        // ===================== ADD =====================
-        public bool Add(PhieuSuCo s)
+        // ========== Thêm ==========
+        public bool Insert(PhieuSuCo model)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"
-                INSERT INTO PhieuSuCo
-                (MaTaiSan, MaKH, NguoiBao, MucUuTien, SLA_Gio, MaNV_TiepNhan,
-                 NgayTao, TrangThai, MoTa, MaPhieuCV)
-                VALUES
-                (@MaTaiSan, @MaKH, @NguoiBao, @MucUuTien, @SLA_Gio, @MaNV_TiepNhan,
-                 @NgayTao, @TrangThai, @MoTa, @MaPhieuCV)", conn);
-
-            cmd.Parameters.AddWithValue("@MaTaiSan", s.MaTaiSan);
-            cmd.Parameters.AddWithValue("@MaKH", (object?)s.MaKH ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@NguoiBao", (object?)s.NguoiBao ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@MucUuTien", s.MucUuTien);
-            cmd.Parameters.AddWithValue("@SLA_Gio", (object?)s.SLA_Gio ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@MaNV_TiepNhan", (object?)s.MaNV_TiepNhan ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@NgayTao", s.NgayTao);
-            cmd.Parameters.AddWithValue("@TrangThai", s.TrangThai);
-            cmd.Parameters.AddWithValue("@MoTa", (object?)s.MoTa ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@MaPhieuCV", (object?)s.MaPhieuCV ?? DBNull.Value);
-
-            conn.Open();
-            return cmd.ExecuteNonQuery() > 0;
+            string sql = @"INSERT INTO PhieuSuCo (MaTaiSan, MoTa, MucDo, NgayBaoCao, TrangThai)
+                           VALUES (@MaTaiSan, @MoTa, @MucDo, @NgayBaoCao, @TrangThai)";
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaTaiSan", model.MaTaiSan);
+                    cmd.Parameters.AddWithValue("@MoTa", (object?)model.MoTa ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@MucDo", model.MucDo);
+                    cmd.Parameters.AddWithValue("@NgayBaoCao", model.NgayBaoCao);
+                    cmd.Parameters.AddWithValue("@TrangThai", model.TrangThai);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
         }
 
-        // ===================== UPDATE =====================
-        public bool Update(PhieuSuCo s)
+        // ========== Cập nhật ==========
+        public bool Update(PhieuSuCo model)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"
-                UPDATE PhieuSuCo
-                SET MaTaiSan=@MaTaiSan, MaKH=@MaKH, NguoiBao=@NguoiBao, 
-                    MucUuTien=@MucUuTien, SLA_Gio=@SLA_Gio, MaNV_TiepNhan=@MaNV_TiepNhan,
-                    TrangThai=@TrangThai, MoTa=@MoTa, MaPhieuCV=@MaPhieuCV
-                WHERE MaSuCo=@MaSuCo", conn);
-
-            cmd.Parameters.AddWithValue("@MaSuCo", s.MaSuCo);
-            cmd.Parameters.AddWithValue("@MaTaiSan", s.MaTaiSan);
-            cmd.Parameters.AddWithValue("@MaKH", (object?)s.MaKH ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@NguoiBao", (object?)s.NguoiBao ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@MucUuTien", s.MucUuTien);
-            cmd.Parameters.AddWithValue("@SLA_Gio", (object?)s.SLA_Gio ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@MaNV_TiepNhan", (object?)s.MaNV_TiepNhan ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@TrangThai", s.TrangThai);
-            cmd.Parameters.AddWithValue("@MoTa", (object?)s.MoTa ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@MaPhieuCV", (object?)s.MaPhieuCV ?? DBNull.Value);
-
-            conn.Open();
-            return cmd.ExecuteNonQuery() > 0;
+            string sql = @"UPDATE PhieuSuCo 
+                           SET MaTaiSan=@MaTaiSan, MoTa=@MoTa, MucDo=@MucDo, 
+                               NgayBaoCao=@NgayBaoCao, TrangThai=@TrangThai
+                           WHERE MaSuCo=@ID";
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ID", model.MaSuCo);
+                    cmd.Parameters.AddWithValue("@MaTaiSan", model.MaTaiSan);
+                    cmd.Parameters.AddWithValue("@MoTa", (object?)model.MoTa ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@MucDo", model.MucDo);
+                    cmd.Parameters.AddWithValue("@NgayBaoCao", model.NgayBaoCao);
+                    cmd.Parameters.AddWithValue("@TrangThai", model.TrangThai);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
         }
 
-        // ===================== DELETE =====================
+        // ========== Xóa ==========
         public bool Delete(int id)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new("DELETE FROM PhieuSuCo WHERE MaSuCo=@id", conn);
-            cmd.Parameters.AddWithValue("@id", id);
-            conn.Open();
-            return cmd.ExecuteNonQuery() > 0;
-        }
-
-        // ===================== GET BY TAI SAN =====================
-        public List<PhieuSuCo> GetByTaiSan(int maTaiSan)
-        {
-            var list = new List<PhieuSuCo>();
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"
-                SELECT s.*, t.TenTaiSan, nv.HoTen AS TenNhanVien
-                FROM PhieuSuCo s
-                LEFT JOIN TaiSan t ON s.MaTaiSan = t.MaTaiSan
-                LEFT JOIN NhanVien nv ON s.MaNV_TiepNhan = nv.MaNV
-                WHERE s.MaTaiSan = @maTaiSan", conn);
-            cmd.Parameters.AddWithValue("@maTaiSan", maTaiSan);
-
-            conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            while (dr.Read())
+            string sql = "DELETE FROM PhieuSuCo WHERE MaSuCo=@id";
+            using (var conn = new SqlConnection(_connStr))
             {
-                list.Add(MapToPhieuSuCo(dr));
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
             }
-            return list;
-        }
-
-        // ===================== KPI SUMMARY =====================
-        public List<(string TrangThai, int SoLuong)> GetSummaryByStatus()
-        {
-            var list = new List<(string, int)>();
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"
-                SELECT TrangThai, COUNT(*) AS SoLuong
-                FROM PhieuSuCo
-                GROUP BY TrangThai", conn);
-
-            conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            while (dr.Read())
-            {
-                list.Add((dr["TrangThai"].ToString(), Convert.ToInt32(dr["SoLuong"])));
-            }
-            return list;
-        }
-
-        // ===================== MAP FUNCTION =====================
-        private static PhieuSuCo MapToPhieuSuCo(SqlDataReader dr)
-        {
-            return new PhieuSuCo
-            {
-                MaSuCo = Convert.ToInt32(dr["MaSuCo"]),
-                MaTaiSan = Convert.ToInt32(dr["MaTaiSan"]),
-                MaKH = dr["MaKH"] == DBNull.Value ? null : Convert.ToInt32(dr["MaKH"]),
-                NguoiBao = dr["NguoiBao"] == DBNull.Value ? null : dr["NguoiBao"].ToString(),
-                MucUuTien = dr["MucUuTien"].ToString(),
-                SLA_Gio = dr["SLA_Gio"] == DBNull.Value ? null : Convert.ToInt32(dr["SLA_Gio"]),
-                MaNV_TiepNhan = dr["MaNV_TiepNhan"] == DBNull.Value ? null : Convert.ToInt32(dr["MaNV_TiepNhan"]),
-                NgayTao = Convert.ToDateTime(dr["NgayTao"]),
-                TrangThai = dr["TrangThai"].ToString(),
-                MoTa = dr["MoTa"] == DBNull.Value ? null : dr["MoTa"].ToString(),
-                MaPhieuCV = dr["MaPhieuCV"] == DBNull.Value ? null : Convert.ToInt32(dr["MaPhieuCV"]),
-                TenTaiSan = dr["TenTaiSan"] == DBNull.Value ? null : dr["TenTaiSan"].ToString(),
-                TenKhachHang = dr["TenKhachHang"] == DBNull.Value ? null : dr["TenKhachHang"].ToString(),
-                TenNhanVien = dr["TenNhanVien"] == DBNull.Value ? null : dr["TenNhanVien"].ToString()
-            };
         }
     }
 }

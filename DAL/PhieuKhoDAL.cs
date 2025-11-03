@@ -7,165 +7,139 @@ namespace BaiMoiiii.DAL
 {
     public class PhieuKhoDAL
     {
-        private readonly string _conn;
+        private readonly string _connStr;
 
-        public PhieuKhoDAL(IConfiguration config)
+        public PhieuKhoDAL(string connStr)
         {
-            _conn = config.GetConnectionString("DefaultConnection");
+            _connStr = connStr;
         }
 
-        // ===================== GET ALL =====================
+        // ========== Lấy tất cả ==========
         public List<PhieuKho> GetAll()
         {
             var list = new List<PhieuKho>();
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new("SELECT * FROM PhieuKho ORDER BY NgayLap DESC", conn);
-            conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            while (dr.Read())
+            string sql = @"
+                SELECT pk.*, nv.HoTen 
+                FROM PhieuKho pk
+                LEFT JOIN NhanVien nv ON pk.MaNV = nv.MaNV
+                ORDER BY pk.MaPhieuKho DESC";
+
+            using (var conn = new SqlConnection(_connStr))
             {
-                list.Add(new PhieuKho
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    MaPhieuKho = Convert.ToInt32(dr["MaPhieuKho"]),
-                    Loai = dr["Loai"].ToString(),
-                    NgayLap = Convert.ToDateTime(dr["NgayLap"]),
-                    GhiChu = dr["GhiChu"] == DBNull.Value ? null : dr["GhiChu"].ToString()
-                });
+                    while (reader.Read())
+                    {
+                        list.Add(new PhieuKho
+                        {
+                            MaPhieuKho = (int)reader["MaPhieuKho"],
+                            Loai = reader["Loai"].ToString(),
+                            NgayLap = (DateTime)reader["NgayLap"],
+                            MaNV = reader["MaNV"] == DBNull.Value ? null : (int?)reader["MaNV"],
+                            TenNhanVien = reader["TenNhanVien"]?.ToString(),
+                            HoTen = reader["HoTen"]?.ToString(),
+                            GhiChu = reader["GhiChu"]?.ToString()
+                        });
+                    }
+                }
             }
             return list;
         }
 
-        // ===================== GET BY ID =====================
+        // ========== Lấy theo ID ==========
         public PhieuKho? GetById(int id)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new("SELECT * FROM PhieuKho WHERE MaPhieuKho=@id", conn);
-            cmd.Parameters.AddWithValue("@id", id);
-            conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
+            PhieuKho? pk = null;
+            string sql = @"
+                SELECT pk.*, nv.HoTen 
+                FROM PhieuKho pk
+                LEFT JOIN NhanVien nv ON pk.MaNV = nv.MaNV
+                WHERE pk.MaPhieuKho = @id";
+
+            using (var conn = new SqlConnection(_connStr))
             {
-                return new PhieuKho
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
                 {
-                    MaPhieuKho = Convert.ToInt32(dr["MaPhieuKho"]),
-                    Loai = dr["Loai"].ToString(),
-                    NgayLap = Convert.ToDateTime(dr["NgayLap"]),
-                    GhiChu = dr["GhiChu"] == DBNull.Value ? null : dr["GhiChu"].ToString()
-                };
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            pk = new PhieuKho
+                            {
+                                MaPhieuKho = (int)reader["MaPhieuKho"],
+                                Loai = reader["Loai"].ToString(),
+                                NgayLap = (DateTime)reader["NgayLap"],
+                                MaNV = reader["MaNV"] == DBNull.Value ? null : (int?)reader["MaNV"],
+                                TenNhanVien = reader["TenNhanVien"]?.ToString(),
+                                HoTen = reader["HoTen"]?.ToString(),
+                                GhiChu = reader["GhiChu"]?.ToString()
+                            };
+                        }
+                    }
+                }
             }
-            return null;
+            return pk;
         }
 
-        // ===================== ADD =====================
-        public bool Add(PhieuKho pk)
+        // ========== Thêm ==========
+        public bool Insert(PhieuKho pk)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"
-                INSERT INTO PhieuKho (Loai, NgayLap, GhiChu)
-                VALUES (@Loai, @NgayLap, @GhiChu)", conn);
-
-            cmd.Parameters.AddWithValue("@Loai", pk.Loai);
-            cmd.Parameters.AddWithValue("@NgayLap", pk.NgayLap);
-            cmd.Parameters.AddWithValue("@GhiChu", (object?)pk.GhiChu ?? DBNull.Value);
-
-            conn.Open();
-            return cmd.ExecuteNonQuery() > 0;
+            string sql = @"INSERT INTO PhieuKho (Loai, NgayLap, MaNV, TenNhanVien, GhiChu)
+                           VALUES (@Loai, @NgayLap, @MaNV, @TenNV, @GhiChu)";
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Loai", pk.Loai);
+                    cmd.Parameters.AddWithValue("@NgayLap", pk.NgayLap);
+                    cmd.Parameters.AddWithValue("@MaNV", (object?)pk.MaNV ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@TenNV", (object?)pk.TenNhanVien ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@GhiChu", (object?)pk.GhiChu ?? DBNull.Value);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
         }
 
-        // ===================== UPDATE =====================
+        // ========== Cập nhật ==========
         public bool Update(PhieuKho pk)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"
-                UPDATE PhieuKho 
-                SET Loai=@Loai, NgayLap=@NgayLap, GhiChu=@GhiChu
-                WHERE MaPhieuKho=@MaPhieuKho", conn);
-
-            cmd.Parameters.AddWithValue("@Loai", pk.Loai);
-            cmd.Parameters.AddWithValue("@NgayLap", pk.NgayLap);
-            cmd.Parameters.AddWithValue("@GhiChu", (object?)pk.GhiChu ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@MaPhieuKho", pk.MaPhieuKho);
-
-            conn.Open();
-            return cmd.ExecuteNonQuery() > 0;
+            string sql = @"UPDATE PhieuKho
+                           SET Loai=@Loai, NgayLap=@NgayLap, MaNV=@MaNV, TenNhanVien=@TenNV, GhiChu=@GhiChu
+                           WHERE MaPhieuKho=@ID";
+            using (var conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ID", pk.MaPhieuKho);
+                    cmd.Parameters.AddWithValue("@Loai", pk.Loai);
+                    cmd.Parameters.AddWithValue("@NgayLap", pk.NgayLap);
+                    cmd.Parameters.AddWithValue("@MaNV", (object?)pk.MaNV ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@TenNV", (object?)pk.TenNhanVien ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@GhiChu", (object?)pk.GhiChu ?? DBNull.Value);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
         }
 
-        // ===================== DELETE =====================
+        // ========== Xóa ==========
         public bool Delete(int id)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new("DELETE FROM PhieuKho WHERE MaPhieuKho=@id", conn);
-            cmd.Parameters.AddWithValue("@id", id);
-            conn.Open();
-            return cmd.ExecuteNonQuery() > 0;
-        }
-
-        // ===================== GET BY TYPE =====================
-        public List<PhieuKho> GetByType(string loai)
-        {
-            var list = new List<PhieuKho>();
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new("SELECT * FROM PhieuKho WHERE Loai=@loai ORDER BY NgayLap DESC", conn);
-            cmd.Parameters.AddWithValue("@loai", loai);
-            conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            while (dr.Read())
+            string sql = "DELETE FROM PhieuKho WHERE MaPhieuKho=@id";
+            using (var conn = new SqlConnection(_connStr))
             {
-                list.Add(new PhieuKho
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
                 {
-                    MaPhieuKho = Convert.ToInt32(dr["MaPhieuKho"]),
-                    Loai = dr["Loai"].ToString(),
-                    NgayLap = Convert.ToDateTime(dr["NgayLap"]),
-                    GhiChu = dr["GhiChu"] == DBNull.Value ? null : dr["GhiChu"].ToString()
-                });
+                    cmd.Parameters.AddWithValue("@id", id);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
             }
-            return list;
-        }
-
-        // ===================== KPI SUMMARY =====================
-        public List<(string Loai, int SoLuong)> GetKpiSummary()
-        {
-            var list = new List<(string, int)>();
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"
-                SELECT Loai, COUNT(*) AS SoLuong 
-                FROM PhieuKho 
-                GROUP BY Loai", conn);
-            conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            while (dr.Read())
-            {
-                list.Add((dr["Loai"].ToString(), Convert.ToInt32(dr["SoLuong"])));
-            }
-            return list;
-        }
-
-        // ===================== KPI TOTAL VALUE =====================
-        public List<PhieuKho> GetTotalValue()
-        {
-            var list = new List<PhieuKho>();
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"
-                SELECT pk.MaPhieuKho, pk.Loai, pk.NgayLap, pk.GhiChu,
-                       ISNULL(SUM(ct.SoLuong * ct.DonGia), 0) AS TongGiaTri
-                FROM PhieuKho pk
-                LEFT JOIN PhieuKho_ChiTiet ct ON pk.MaPhieuKho = ct.MaPhieuKho
-                GROUP BY pk.MaPhieuKho, pk.Loai, pk.NgayLap, pk.GhiChu
-                ORDER BY pk.NgayLap DESC", conn);
-            conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            while (dr.Read())
-            {
-                list.Add(new PhieuKho
-                {
-                    MaPhieuKho = Convert.ToInt32(dr["MaPhieuKho"]),
-                    Loai = dr["Loai"].ToString(),
-                    NgayLap = Convert.ToDateTime(dr["NgayLap"]),
-                    GhiChu = dr["GhiChu"] == DBNull.Value ? null : dr["GhiChu"].ToString(),
-                    TongGiaTri = Convert.ToDecimal(dr["TongGiaTri"])
-                });
-            }
-            return list;
         }
     }
 }

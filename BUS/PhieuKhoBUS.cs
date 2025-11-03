@@ -1,4 +1,5 @@
-﻿using BaiMoiiii.DAL;
+﻿using System.Collections.Generic;
+using BaiMoiiii.DAL;
 using BaiMoiiii.MODEL;
 
 namespace BaiMoiiii.BUS
@@ -7,43 +8,19 @@ namespace BaiMoiiii.BUS
     {
         private readonly PhieuKhoDAL _dal;
 
-        public PhieuKhoBUS(IConfiguration config)
+        public PhieuKhoBUS(string connStr)
         {
-            _dal = new PhieuKhoDAL(config);
+            _dal = new PhieuKhoDAL(connStr);
         }
 
         public List<PhieuKho> GetAll() => _dal.GetAll();
+
         public PhieuKho? GetById(int id) => _dal.GetById(id);
-        public bool Add(PhieuKho pk)
-        {
-            if (string.IsNullOrWhiteSpace(pk.Loai))
-                throw new ArgumentException("Loại phiếu không được trống!");
-            pk.NgayLap = DateTime.UtcNow;
-            return _dal.Add(pk);
-        }
 
-        public bool Update(PhieuKho pk)
-        {
-            if (pk.MaPhieuKho <= 0)
-                throw new ArgumentException("Mã phiếu kho không hợp lệ!");
-            return _dal.Update(pk);
-        }
+        public bool Add(PhieuKho pk) => _dal.Insert(pk);
 
-        public bool Delete(int id)
-        {
-            if (id <= 0)
-                throw new ArgumentException("Mã phiếu kho không hợp lệ!");
-            return _dal.Delete(id);
-        }
+        public bool Update(PhieuKho pk) => _dal.Update(pk);
 
-        public List<PhieuKho> GetByType(string loai) => _dal.GetByType(loai);
-
-        public object GetKpiSummary()
-        {
-            var data = _dal.GetKpiSummary();
-            return data.Select(x => new { x.Loai, x.SoLuong });
-        }
-
-        public List<PhieuKho> GetTotalValue() => _dal.GetTotalValue();
+        public bool Delete(int id) => _dal.Delete(id);
     }
 }

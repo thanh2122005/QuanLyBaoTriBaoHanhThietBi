@@ -1,22 +1,31 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BaiMoiiii.MODEL
 {
+    [Table("PhieuSuCo")]
     public class PhieuSuCo
     {
+        [Key]
         public int MaSuCo { get; set; }
+
+        [Required]
         public int MaTaiSan { get; set; }
+
+        [NotMapped]
         public string? TenTaiSan { get; set; }
-        public int? MaKH { get; set; }
-        public string? TenKhachHang { get; set; }
-        public string? NguoiBao { get; set; }
-        public string MucUuTien { get; set; } = "Trung bình";
-        public int? SLA_Gio { get; set; }
-        public int? MaNV_TiepNhan { get; set; }
-        public string? TenNhanVien { get; set; }
-        public DateTime NgayTao { get; set; } = DateTime.UtcNow;
-        public string TrangThai { get; set; } = "Mới";
+
+        [StringLength(500)]
         public string? MoTa { get; set; }
-        public int? MaPhieuCV { get; set; }
+
+        [Required, StringLength(20)]
+        public string MucDo { get; set; } = "Trung bình";  // Thấp, Trung bình, Cao, Khẩn
+
+        [Required]
+        public DateTime NgayBaoCao { get; set; } = DateTime.UtcNow;
+
+        [Required, StringLength(30)]
+        public string TrangThai { get; set; } = "Mới";  // Mới, Đang xử lý, Đã giải quyết, Đóng
     }
 }
