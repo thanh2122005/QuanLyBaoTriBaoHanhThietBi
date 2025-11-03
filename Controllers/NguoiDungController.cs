@@ -80,6 +80,23 @@ namespace BaiMoiiii.API.Controllers
             }
         }
 
+        [HttpGet("by-role/{roleId}")]
+        public IActionResult GetByRole(int roleId)
+        {
+            var list = _bus.GetByRole(roleId);
+            if (!list.Any())
+                return NotFound(new { message = "Không có người dùng trong vai trò này." });
+            return Ok(list);
+        }
+
+        [HttpGet("by-username/{username}")]
+        public IActionResult GetByUsername(string username)
+        {
+            var user = _bus.GetByUsername(username);
+            if (user == null)
+                return NotFound(new { message = $"Không tìm thấy người dùng có tên đăng nhập '{username}'" });
+            return Ok(user);
+        }
 
     }
 }
