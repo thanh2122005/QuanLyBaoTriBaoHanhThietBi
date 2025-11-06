@@ -15,6 +15,16 @@ namespace BaiMoiiii.BUS
         public List<NhanVien> GetAll() => _dal.GetAll();
         public NhanVien? GetById(int id) => _dal.GetById(id);
 
-        
+        public bool Add(NhanVien nv)
+        {
+            if (string.IsNullOrWhiteSpace(nv.HoTen))
+                throw new ArgumentException("Họ tên không được để trống.");
+
+            nv.TrangThai ??= "Hoạt động";
+            return _dal.Add(nv);
+        }
+
+
+
     }
 }

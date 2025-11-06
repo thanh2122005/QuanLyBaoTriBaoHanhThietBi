@@ -13,7 +13,59 @@ namespace BaiMoiiii.DAL
         {
             _conn = config.GetConnectionString("DefaultConnection");
         }
+        // ===== Hàm dùng chung để map dữ liệu từ DataReader =====
+        private NhanVien MapReader(SqlDataReader dr)
+        {
+            return new NhanVien
+            {
+                MaNV = Convert.ToInt32(dr["MaNV"]),
+                HoTen = dr["HoTen"].ToString(),
+                SoDienThoai = dr["SoDienThoai"] == DBNull.Value ? null : dr["SoDienThoai"].ToString(),
+                Email = dr["Email"] == DBNull.Value ? null : dr["Email"].ToString(),
+                TrangThai = dr["TrangThai"].ToString()
+            };
+        }
 
-      
+        // ==================== GET ALL ====================
+        public List<NhanVien> GetAll()
+        {
+            var list = new List<NhanVien>();
+            try
+            {
+                using var conn = new SqlConnection(_conn);
+                using var cmd = new SqlCommand("SELECT * FROM NhanVien ORDER BY MaNV DESC", conn);
+                conn.Open();
+
+                using var dr = cmd.ExecuteReader();
+                while (dr.Read())
+                    list.Add(MapReader(dr));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] GetAll NhanVien: {ex.Message}");
+            }
+            return list;
+        }
+
+        // ==================== GET BY ID ====================
+        public NhanVien? GetById(int id)
+        {
+            try
+            {
+                using var conn = new SqlConnection(_conn);
+                using var cmd = new SqlCommand("SELECT * FROM NhanVien WHERE MaNV=@id", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                conn.Open();
+
+                using var dr = cmd.ExecuteReader();
+                return dr.Read() ? MapReader(dr) : null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] GetById NhanVien: {ex.Message}");
+                return null;
+            }
+        }
+
     }
 }
