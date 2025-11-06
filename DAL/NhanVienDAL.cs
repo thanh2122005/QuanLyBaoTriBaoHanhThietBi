@@ -67,5 +67,30 @@ namespace BaiMoiiii.DAL
             }
         }
 
+        // ==================== ADD ====================
+        public bool Add(NhanVien nv)
+        {
+            try
+            {
+                using var conn = new SqlConnection(_conn);
+                using var cmd = new SqlCommand(@"
+                    INSERT INTO NhanVien (HoTen, SoDienThoai, Email, TrangThai)
+                    VALUES (@HoTen, @SoDienThoai, @Email, @TrangThai)", conn);
+
+                cmd.Parameters.AddWithValue("@HoTen", nv.HoTen);
+                cmd.Parameters.AddWithValue("@SoDienThoai", (object?)nv.SoDienThoai ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Email", (object?)nv.Email ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@TrangThai", nv.TrangThai);
+
+                conn.Open();
+                return cmd.ExecuteNonQuery() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Add NhanVien: {ex.Message}");
+                return false;
+            }
+        }
+
     }
 }

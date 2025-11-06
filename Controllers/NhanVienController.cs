@@ -50,6 +50,29 @@ namespace BaiMoiiii.API.Controllers
             }
         }
 
+        // ===================== CREATE =====================
+        [HttpPost("create")]
+        public IActionResult Create([FromBody] NhanVien model)
+        {
+            if (model == null)
+                return BadRequest(new { message = "Dữ liệu không hợp lệ." });
+
+            try
+            {
+                var result = _bus.Add(model);
+                if (result)
+                    return CreatedAtAction(nameof(GetById), new { id = model.MaNV },
+                        new { message = "Thêm nhân viên thành công!", data = model });
+
+                return BadRequest(new { message = "Không thể thêm nhân viên." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi thêm nhân viên.", error = ex.Message });
+            }
+        }
+
+
 
     }
 }
