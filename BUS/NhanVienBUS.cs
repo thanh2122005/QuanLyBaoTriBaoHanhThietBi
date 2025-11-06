@@ -19,8 +19,8 @@ namespace BaiMoiiii.BUS
         {
             if (string.IsNullOrWhiteSpace(nv.HoTen))
                 throw new ArgumentException("Họ tên không được để trống.");
-
-            nv.TrangThai ??= "Hoạt động";
+            if (string.IsNullOrWhiteSpace(nv.TrangThai))
+                nv.TrangThai = "Hoạt động";
             return _dal.Add(nv);
         }
 
@@ -28,9 +28,6 @@ namespace BaiMoiiii.BUS
         {
             if (nv.MaNV <= 0)
                 throw new ArgumentException("Mã nhân viên không hợp lệ.");
-            if (string.IsNullOrWhiteSpace(nv.HoTen))
-                throw new ArgumentException("Họ tên không được để trống.");
-
             return _dal.Update(nv);
         }
 
@@ -42,7 +39,5 @@ namespace BaiMoiiii.BUS
         }
 
         public int CountActive() => _dal.CountActive();
-
-
     }
 }

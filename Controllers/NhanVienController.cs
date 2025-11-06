@@ -19,118 +19,85 @@ namespace BaiMoiiii.API.Controllers
         [HttpGet("get-all")]
         public IActionResult GetAll()
         {
-            try
-            {
-                var list = _bus.GetAll();
-                if (list == null || !list.Any())
-                    return NotFound(new { message = "Không có nhân viên nào trong hệ thống." });
+            var list = _bus.GetAll();
+            if (list == null || !list.Any())
+                return NotFound(new { message = "Không có nhân viên nào trong hệ thống!" });
 
-                return Ok(list);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Lỗi khi lấy danh sách nhân viên.", error = ex.Message });
-            }
+            return Ok(list);
         }
 
         // ===================== GET BY ID =====================
-        [HttpGet("get/{id:int}")]
+        [HttpGet("get/{id}")]
         public IActionResult GetById(int id)
         {
-            try
-            {
-                var nv = _bus.GetById(id);
-                if (nv == null)
-                    return NotFound(new { message = $"Không tìm thấy nhân viên có ID = {id}" });
-                return Ok(nv);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Lỗi khi lấy nhân viên theo ID.", error = ex.Message });
-            }
+            var nv = _bus.GetById(id);
+            if (nv == null)
+                return NotFound(new { message = $"Không tìm thấy nhân viên có ID = {id}" });
+            return Ok(nv);
         }
 
         // ===================== CREATE =====================
         [HttpPost("create")]
         public IActionResult Create([FromBody] NhanVien model)
         {
-            if (model == null)
-                return BadRequest(new { message = "Dữ liệu không hợp lệ." });
-
             try
             {
-                var result = _bus.Add(model);
-                if (result)
-                    return CreatedAtAction(nameof(GetById), new { id = model.MaNV },
-                        new { message = "Thêm nhân viên thành công!", data = model });
-
-                return BadRequest(new { message = "Không thể thêm nhân viên." });
+                if (_bus.Add(model))
+                    return Ok(new { message = "Thêm nhân viên thành công!" });
+                return BadRequest(new { message = "Thêm thất bại!" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi thêm nhân viên.", error = ex.Message });
+                return BadRequest(new { error = ex.Message });
             }
         }
 
-
         // ===================== UPDATE =====================
-        [HttpPut("update/{id:int}")]
+        [HttpPut("update/{id}")]
         public IActionResult Update(int id, [FromBody] NhanVien model)
         {
-            if (model == null)
-                return BadRequest(new { message = "Dữ liệu không hợp lệ." });
-
             try
             {
                 model.MaNV = id;
                 if (_bus.Update(model))
                     return Ok(new { message = "Cập nhật nhân viên thành công!" });
-
-                return NotFound(new { message = $"Không tìm thấy nhân viên có ID = {id}" });
+                return NotFound(new { message = "Không tìm thấy nhân viên cần cập nhật." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi cập nhật nhân viên.", error = ex.Message });
+                return BadRequest(new { error = ex.Message });
             }
         }
 
         // ===================== DELETE =====================
-        [HttpDelete("delete/{id:int}")]
+        [HttpDelete("delete/{id}")]
         public IActionResult Delete(int id)
         {
             try
             {
                 if (_bus.Delete(id))
                     return Ok(new { message = "Xóa nhân viên thành công!" });
-
-                return NotFound(new { message = $"Không tìm thấy nhân viên có ID = {id}" });
+                return NotFound(new { message = "Không tìm thấy nhân viên để xóa." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi xóa nhân viên.", error = ex.Message });
+                return BadRequest(new { error = ex.Message });
             }
         }
 
-
-        // ===================== KPI =====================
+        // ===================== KPI: SỐ NHÂN VIÊN HOẠT ĐỘNG =====================
         [HttpGet("kpi/hoat-dong")]
         public IActionResult CountActive()
         {
             try
             {
-                var count = _bus.CountActive();
-                return Ok(new
-                {
-                    message = "Thống kê số nhân viên hoạt động thành công!",
-                    soNhanVienHoatDong = count
-                });
+                int count = _bus.CountActive();
+                return Ok(new { message = "Thống kê thành công!", soNhanVienHoatDong = count });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi thống kê.", error = ex.Message });
+                return BadRequest(new { error = ex.Message });
             }
         }
-
     }
 }
-    
