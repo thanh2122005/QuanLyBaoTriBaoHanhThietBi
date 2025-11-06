@@ -24,6 +24,15 @@ namespace BaiMoiiii.BUS
             return _dal.Add(nv);
         }
 
+        public bool Update(NhanVien nv)
+        {
+            if (nv.MaNV <= 0)
+                throw new ArgumentException("Mã nhân viên không hợp lệ.");
+            if (string.IsNullOrWhiteSpace(nv.HoTen))
+                throw new ArgumentException("Họ tên không được để trống.");
+
+            return _dal.Update(nv);
+        }
 
 
     }

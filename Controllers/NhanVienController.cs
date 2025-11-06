@@ -73,6 +73,27 @@ namespace BaiMoiiii.API.Controllers
         }
 
 
+        // ===================== UPDATE =====================
+        [HttpPut("update/{id:int}")]
+        public IActionResult Update(int id, [FromBody] NhanVien model)
+        {
+            if (model == null)
+                return BadRequest(new { message = "Dữ liệu không hợp lệ." });
+
+            try
+            {
+                model.MaNV = id;
+                if (_bus.Update(model))
+                    return Ok(new { message = "Cập nhật nhân viên thành công!" });
+
+                return NotFound(new { message = $"Không tìm thấy nhân viên có ID = {id}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi cập nhật nhân viên.", error = ex.Message });
+            }
+        }
+
 
     }
 }
