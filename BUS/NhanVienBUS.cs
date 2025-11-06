@@ -41,6 +41,8 @@ namespace BaiMoiiii.BUS
             return _dal.Delete(id);
         }
 
+        public int CountActive() => _dal.CountActive();
+
 
     }
 }

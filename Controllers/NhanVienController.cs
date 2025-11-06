@@ -112,6 +112,25 @@ namespace BaiMoiiii.API.Controllers
         }
 
 
+        // ===================== KPI =====================
+        [HttpGet("kpi/hoat-dong")]
+        public IActionResult CountActive()
+        {
+            try
+            {
+                var count = _bus.CountActive();
+                return Ok(new
+                {
+                    message = "Thống kê số nhân viên hoạt động thành công!",
+                    soNhanVienHoatDong = count
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi thống kê.", error = ex.Message });
+            }
+        }
+
     }
 }
     

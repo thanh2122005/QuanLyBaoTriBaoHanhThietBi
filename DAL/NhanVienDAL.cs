@@ -138,5 +138,22 @@ namespace BaiMoiiii.DAL
             }
         }
 
+        // ==================== KPI ====================
+        public int CountActive()
+        {
+            try
+            {
+                using var conn = new SqlConnection(_conn);
+                using var cmd = new SqlCommand("SELECT COUNT(*) FROM NhanVien WHERE TrangThai = N'Hoạt động'", conn);
+                conn.Open();
+                return (int)cmd.ExecuteScalar();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] CountActive NhanVien: {ex.Message}");
+                return 0;
+            }
+
+
+        }
     }
-}
