@@ -94,6 +94,23 @@ namespace BaiMoiiii.API.Controllers
             }
         }
 
+        // ===================== DELETE =====================
+        [HttpDelete("delete/{id:int}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                if (_bus.Delete(id))
+                    return Ok(new { message = "Xóa nhân viên thành công!" });
+
+                return NotFound(new { message = $"Không tìm thấy nhân viên có ID = {id}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi xóa nhân viên.", error = ex.Message });
+            }
+        }
+
 
     }
 }

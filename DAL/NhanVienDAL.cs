@@ -119,7 +119,24 @@ namespace BaiMoiiii.DAL
             }
         }
 
+        // ==================== DELETE ====================
+        public bool Delete(int id)
+        {
+            try
+            {
+                using var conn = new SqlConnection(_conn);
+                using var cmd = new SqlCommand("DELETE FROM NhanVien WHERE MaNV=@id", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                conn.Open();
 
+                return cmd.ExecuteNonQuery() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Delete NhanVien: {ex.Message}");
+                return false;
+            }
+        }
 
     }
 }
