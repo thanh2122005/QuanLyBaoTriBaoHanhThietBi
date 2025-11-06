@@ -1,5 +1,6 @@
 ﻿using BaiMoiiii.BUS;
 using BaiMoiiii.DAL;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +40,17 @@ builder.Services.AddScoped<KhachHangBUS>(_ => new KhachHangBUS(connStr));
 // ♦ TÀI SẢN
 builder.Services.AddSingleton(new TaiSanDAL(connStr));
 builder.Services.AddScoped<TaiSanBUS>(_ => new TaiSanBUS(connStr));
+// ♦ NHÂN VIÊN ✅ (bổ sung bắt buộc)
+builder.Services.AddSingleton(new NhanVienDAL(connStr));
+builder.Services.AddScoped<NhanVienBUS>(_ => new NhanVienBUS(connStr));
 
+// ♦ PHIẾU SỰ CỐ ✅ (bổ sung)
+builder.Services.AddSingleton(new PhieuSuCoDAL(connStr));
+builder.Services.AddScoped<PhieuSuCoBUS>(_ => new PhieuSuCoBUS(connStr));
+
+// ♦ PHIẾU CÔNG VIỆC ✅ (bổ sung)
+builder.Services.AddSingleton(new PhieuCongViecDAL(connStr));
+builder.Services.AddScoped<PhieuCongViecBUS>(_ => new PhieuCongViecBUS(connStr));
 // ⚙️ Bạn có thể thêm module khác tương tự:
 // builder.Services.AddSingleton(new NhanVienDAL(connStr));
 // builder.Services.AddScoped<NhanVienBUS>(_ => new NhanVienBUS(connStr));

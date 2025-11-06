@@ -22,7 +22,7 @@ namespace BaiMoiiii.MODEL
         public string? DieuKhoan { get; set; }
 
         [Required]
-        public int MaTaiSan { get; set; }   //
+        public int? MaTaiSan { get; set; }
 
         [NotMapped]
         public string? TenTaiSan { get; set; } 

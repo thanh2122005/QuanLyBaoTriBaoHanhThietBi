@@ -1,4 +1,6 @@
-﻿using BaiMoiiii.DAL;
+﻿using System;
+using System.Collections.Generic;
+using BaiMoiiii.DAL;
 using BaiMoiiii.MODEL;
 
 namespace BaiMoiiii.BUS
@@ -7,12 +9,14 @@ namespace BaiMoiiii.BUS
     {
         private readonly PhieuCongViecDAL _dal;
 
-        public PhieuCongViecBUS(IConfiguration config)
+        // ✅ ĐỔI constructor này
+        public PhieuCongViecBUS(string connStr)
         {
-            _dal = new PhieuCongViecDAL(config);
+            _dal = new PhieuCongViecDAL(connStr);
         }
 
         public List<PhieuCongViec> GetAll() => _dal.GetAll();
+
         public PhieuCongViec? GetById(int id) => _dal.GetById(id);
 
         public bool Add(PhieuCongViec p)
@@ -25,7 +29,8 @@ namespace BaiMoiiii.BUS
                 p.TrangThai = "Mới";
             if (string.IsNullOrWhiteSpace(p.MucUuTien))
                 p.MucUuTien = "Trung bình";
-            p.NgayTao = DateTime.UtcNow;
+
+            p.NgayTao = DateTime.Now;
             return _dal.Add(p);
         }
 

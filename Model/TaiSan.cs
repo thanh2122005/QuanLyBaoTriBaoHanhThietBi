@@ -4,7 +4,8 @@ namespace BaiMoiiii.MODEL
 {
     public class TaiSan
     {
-        public int MaTaiSan { get; set; }
+        public int? MaTaiSan { get; set; }
+    
         public string TenTaiSan { get; set; } = string.Empty;
         public string? ViTri { get; set; }
         public DateTime? NgayMua { get; set; }

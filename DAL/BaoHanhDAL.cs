@@ -13,7 +13,7 @@ namespace BaiMoiiii.DAL
             _connStr = connStr;
         }
 
-        // Lấy tất cả
+        // ================== LẤY TẤT CẢ ==================
         public List<BaoHanh> GetAll()
         {
             var list = new List<BaoHanh>();
@@ -36,9 +36,9 @@ namespace BaiMoiiii.DAL
                             NhaCungCap = reader["NhaCungCap"].ToString(),
                             NgayBatDau = (DateTime)reader["NgayBatDau"],
                             NgayKetThuc = (DateTime)reader["NgayKetThuc"],
-                            DieuKhoan = reader["DieuKhoan"]?.ToString(),
-                            MaTaiSan = (int)reader["MaTaiSan"],
-                            TenTaiSan = reader["TenTaiSan"]?.ToString()
+                            DieuKhoan = reader["DieuKhoan"] == DBNull.Value ? null : reader["DieuKhoan"].ToString(),
+                            MaTaiSan = reader["MaTaiSan"] == DBNull.Value ? null : (int?)reader["MaTaiSan"],
+                            TenTaiSan = reader["TenTaiSan"] == DBNull.Value ? null : reader["TenTaiSan"].ToString()
                         });
                     }
                 }
@@ -46,7 +46,7 @@ namespace BaiMoiiii.DAL
             return list;
         }
 
-        // Lấy theo ID
+        // ================== LẤY THEO ID ==================
         public BaoHanh? GetById(int id)
         {
             BaoHanh? bh = null;
@@ -71,18 +71,19 @@ namespace BaiMoiiii.DAL
                                 NhaCungCap = reader["NhaCungCap"].ToString(),
                                 NgayBatDau = (DateTime)reader["NgayBatDau"],
                                 NgayKetThuc = (DateTime)reader["NgayKetThuc"],
-                                DieuKhoan = reader["DieuKhoan"]?.ToString(),
-                                MaTaiSan = (int)reader["MaTaiSan"],
-                                TenTaiSan = reader["TenTaiSan"]?.ToString()
+                                DieuKhoan = reader["DieuKhoan"] == DBNull.Value ? null : reader["DieuKhoan"].ToString(),
+                                MaTaiSan = reader["MaTaiSan"] == DBNull.Value ? null : (int?)reader["MaTaiSan"],
+                                TenTaiSan = reader["TenTaiSan"] == DBNull.Value ? null : reader["TenTaiSan"].ToString()
                             };
                         }
+
                     }
                 }
             }
             return bh;
         }
 
-        // Thêm mới
+        // ================== THÊM MỚI ==================
         public bool Insert(BaoHanh bh)
         {
             string sql = @"INSERT INTO BaoHanh (NhaCungCap, NgayBatDau, NgayKetThuc, DieuKhoan, MaTaiSan)
@@ -96,13 +97,13 @@ namespace BaiMoiiii.DAL
                     cmd.Parameters.AddWithValue("@NBD", bh.NgayBatDau);
                     cmd.Parameters.AddWithValue("@NKT", bh.NgayKetThuc);
                     cmd.Parameters.AddWithValue("@DK", (object)bh.DieuKhoan ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@MTS", bh.MaTaiSan);
+                    cmd.Parameters.AddWithValue("@MTS", (object?)bh.MaTaiSan ?? DBNull.Value);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
 
-        // Cập nhật
+        // ================== CẬP NHẬT ==================
         public bool Update(BaoHanh bh)
         {
             string sql = @"UPDATE BaoHanh 
@@ -118,13 +119,13 @@ namespace BaiMoiiii.DAL
                     cmd.Parameters.AddWithValue("@NBD", bh.NgayBatDau);
                     cmd.Parameters.AddWithValue("@NKT", bh.NgayKetThuc);
                     cmd.Parameters.AddWithValue("@DK", (object)bh.DieuKhoan ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@MTS", bh.MaTaiSan);
+                    cmd.Parameters.AddWithValue("@MTS", (object?)bh.MaTaiSan ?? DBNull.Value);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
 
-        // Xóa
+        // ================== XÓA ==================
         public bool Delete(int id)
         {
             string sql = "DELETE FROM BaoHanh WHERE MaBaoHanh = @id";

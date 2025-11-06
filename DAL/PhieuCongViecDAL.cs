@@ -9,9 +9,9 @@ namespace BaiMoiiii.DAL
     {
         private readonly string _conn;
 
-        public PhieuCongViecDAL(IConfiguration config)
+        public PhieuCongViecDAL(string connectionString)
         {
-            _conn = config.GetConnectionString("DefaultConnection");
+            _conn = connectionString;
         }
 
         // ===================== GET ALL =====================
@@ -27,7 +27,7 @@ namespace BaiMoiiii.DAL
                 ORDER BY p.NgayTao DESC", conn);
 
             conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
+            using SqlDataReader dr = cmd.ExecuteReader();
             while (dr.Read())
             {
                 list.Add(new PhieuCongViec
@@ -50,7 +50,6 @@ namespace BaiMoiiii.DAL
                     TenNhanVien = dr["TenNhanVien"] == DBNull.Value ? null : dr["TenNhanVien"].ToString()
                 });
             }
-
             return list;
         }
 
@@ -67,7 +66,7 @@ namespace BaiMoiiii.DAL
             cmd.Parameters.AddWithValue("@id", id);
 
             conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
+            using SqlDataReader dr = cmd.ExecuteReader();
             if (dr.Read())
             {
                 return new PhieuCongViec
