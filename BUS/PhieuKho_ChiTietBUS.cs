@@ -16,6 +16,8 @@ namespace BaiMoiiii.BUS
         public PhieuKho_ChiTiet? GetById(int id) => _dal.GetById(id);
         public List<PhieuKho_ChiTiet> GetByPhieu(int maPhieu) => _dal.GetByPhieu(maPhieu);
 
+        // ✅ THÊM MỚI (đây là chỗ đang thiếu)
+       
         public bool Add(PhieuKho_ChiTiet ct)
         {
             if (ct.MaPhieuKho <= 0)

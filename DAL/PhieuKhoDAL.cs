@@ -14,7 +14,9 @@ namespace BaiMoiiii.DAL
             _connStr = connStr;
         }
 
-        // ========== Lấy tất cả ==========
+        // =========================================================
+        // 🟩 LẤY TẤT CẢ PHIẾU KHO
+        // =========================================================
         public List<PhieuKho> GetAll()
         {
             var list = new List<PhieuKho>();
@@ -48,7 +50,9 @@ namespace BaiMoiiii.DAL
             return list;
         }
 
-        // ========== Lấy theo ID ==========
+        // =========================================================
+        // 🟩 LẤY THEO ID
+        // =========================================================
         public PhieuKho? GetById(int id)
         {
             PhieuKho? pk = null;
@@ -85,49 +89,101 @@ namespace BaiMoiiii.DAL
             return pk;
         }
 
-        // ========== Thêm ==========
+        // =========================================================
+        // 🟩 THÊM MỚI
+        // =========================================================
         public bool Insert(PhieuKho pk)
         {
-            string sql = @"INSERT INTO PhieuKho (Loai, NgayLap, MaNV, TenNhanVien, GhiChu)
-                           VALUES (@Loai, @NgayLap, @MaNV, @TenNV, @GhiChu)";
-            using (var conn = new SqlConnection(_connStr))
+            string sql = @"
+                INSERT INTO PhieuKho (Loai, NgayLap, MaNV, TenNhanVien, GhiChu)
+                VALUES (@Loai, @NgayLap, @MaNV, @TenNhanVien, @GhiChu)";
+            try
             {
-                conn.Open();
-                using (var cmd = new SqlCommand(sql, conn))
+                using (var conn = new SqlConnection(_connStr))
                 {
-                    cmd.Parameters.AddWithValue("@Loai", pk.Loai);
-                    cmd.Parameters.AddWithValue("@NgayLap", pk.NgayLap);
-                    cmd.Parameters.AddWithValue("@MaNV", (object?)pk.MaNV ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@TenNV", (object?)pk.TenNhanVien ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@GhiChu", (object?)pk.GhiChu ?? DBNull.Value);
-                    return cmd.ExecuteNonQuery() > 0;
+                    conn.Open();
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        // === CHUẨN HÓA LOẠI PHIẾU ===
+                        string loai = string.IsNullOrWhiteSpace(pk.Loai) ? "Nhap" : pk.Loai.Trim();
+
+                        // Tự động chuyển về dạng hợp lệ (theo CHECK constraint)
+                        if (loai.Equals("Nhập", StringComparison.OrdinalIgnoreCase)) loai = "Nhap";
+                        else if (loai.Equals("Xuất", StringComparison.OrdinalIgnoreCase)) loai = "Xuat";
+                        else if (loai != "Nhap" && loai != "Xuat") loai = "Nhap";
+
+                        cmd.Parameters.AddWithValue("@Loai", loai);
+
+                        // === XỬ LÝ NGÀY ===
+                        DateTime ngayLapValue;
+                        if (pk.NgayLap == default || pk.NgayLap.Year < 1900)
+                            ngayLapValue = DateTime.Now;
+                        else
+                            ngayLapValue = pk.NgayLap;
+
+                        cmd.Parameters.AddWithValue("@NgayLap", ngayLapValue);
+
+                        // === CÁC TRƯỜNG KHÁC ===
+                        cmd.Parameters.AddWithValue("@MaNV", (object?)pk.MaNV ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@TenNhanVien", (object?)pk.TenNhanVien ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@GhiChu", (object?)pk.GhiChu ?? DBNull.Value);
+
+                        // === THỰC THI ===
+                        int rows = cmd.ExecuteNonQuery();
+                        Console.WriteLine($"✅ Đã thêm {rows} dòng mới vào bảng PhieuKho.");
+                        return rows > 0;
+                    }
                 }
+            }
+            catch (SqlException sqlEx)
+            {
+                Console.WriteLine("❌ Lỗi SQL khi thêm phiếu kho: " + sqlEx.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Lỗi khác khi thêm phiếu kho: " + ex.Message);
+                throw;
             }
         }
 
-        // ========== Cập nhật ==========
+        // =========================================================
+        // 🟩 CẬP NHẬT
+        // =========================================================
         public bool Update(PhieuKho pk)
         {
-            string sql = @"UPDATE PhieuKho
-                           SET Loai=@Loai, NgayLap=@NgayLap, MaNV=@MaNV, TenNhanVien=@TenNV, GhiChu=@GhiChu
-                           WHERE MaPhieuKho=@ID";
+            string sql = @"
+                UPDATE PhieuKho
+                SET Loai=@Loai, NgayLap=@NgayLap, MaNV=@MaNV, TenNhanVien=@TenNhanVien, GhiChu=@GhiChu
+                WHERE MaPhieuKho=@ID";
+
             using (var conn = new SqlConnection(_connStr))
             {
                 conn.Open();
                 using (var cmd = new SqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@ID", pk.MaPhieuKho);
-                    cmd.Parameters.AddWithValue("@Loai", pk.Loai);
+
+                    // Chuẩn hóa loại phiếu
+                    string loai = string.IsNullOrWhiteSpace(pk.Loai) ? "Nhap" : pk.Loai.Trim();
+                    if (loai.Equals("Nhập", StringComparison.OrdinalIgnoreCase)) loai = "Nhap";
+                    else if (loai.Equals("Xuất", StringComparison.OrdinalIgnoreCase)) loai = "Xuat";
+                    else if (loai != "Nhap" && loai != "Xuat") loai = "Nhap";
+                    cmd.Parameters.AddWithValue("@Loai", loai);
+
                     cmd.Parameters.AddWithValue("@NgayLap", pk.NgayLap);
                     cmd.Parameters.AddWithValue("@MaNV", (object?)pk.MaNV ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@TenNV", (object?)pk.TenNhanVien ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@TenNhanVien", (object?)pk.TenNhanVien ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@GhiChu", (object?)pk.GhiChu ?? DBNull.Value);
+
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
 
-        // ========== Xóa ==========
+        // =========================================================
+        // 🟩 XÓA
+        // =========================================================
         public bool Delete(int id)
         {
             string sql = "DELETE FROM PhieuKho WHERE MaPhieuKho=@id";
