@@ -9,9 +9,9 @@ namespace BaiMoiiii.DAL
     {
         private readonly string _connStr;
 
-        public TaiKhoanDAL(string connStr)
+        public TaiKhoanDAL(IConfiguration config)
         {
-            _connStr = connStr;
+            _connStr = config.GetConnectionString("DefaultConnection");
         }
 
         // ===== Lấy tất cả tài khoản =====

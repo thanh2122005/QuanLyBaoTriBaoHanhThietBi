@@ -67,6 +67,23 @@ builder.Services.AddScoped<PhieuCongViecBUS>(_ => new PhieuCongViecBUS(connStr))
 builder.Services.AddSingleton(new PhieuKhoDAL(connStr));
 builder.Services.AddScoped<PhieuKhoBUS>(_ => new PhieuKhoBUS(connStr));
 
+//// ♦ CHI TIẾT PHIẾU KHO ✅
+builder.Services.AddSingleton<PhieuKho_ChiTietDAL>();
+builder.Services.AddScoped<PhieuKho_ChiTietBUS>();
+
+
+// ♦ LINH KIỆN ✅
+builder.Services.AddSingleton<LinhKienDAL>();
+builder.Services.AddScoped<LinhKienBUS>();
+
+// Tài Khoản
+builder.Services.AddSingleton<TaiKhoanBUS>();
+builder.Services.AddSingleton<TaiKhoanDAL>();
+
+//Lịch Bảo trì 
+builder.Services.AddSingleton<LichBaoTriBUS>();
+builder.Services.AddSingleton<LichBaoTriDAL>();
+
 // =====================================================
 // 🚀 BUILD APP
 // =====================================================

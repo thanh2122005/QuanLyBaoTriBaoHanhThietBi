@@ -1,5 +1,6 @@
 ﻿using BaiMoiiii.DAL;
 using BaiMoiiii.MODEL;
+using System.Collections.Generic;
 
 namespace BaiMoiiii.BUS
 {
@@ -7,41 +8,21 @@ namespace BaiMoiiii.BUS
     {
         private readonly PhieuKho_ChiTietDAL _dal;
 
-        public PhieuKho_ChiTietBUS(IConfiguration config)
+        public PhieuKho_ChiTietBUS(PhieuKho_ChiTietDAL dal)
         {
-            _dal = new PhieuKho_ChiTietDAL(config);
+            _dal = dal;
         }
 
         public List<PhieuKho_ChiTiet> GetAll() => _dal.GetAll();
-        public PhieuKho_ChiTiet? GetById(int id) => _dal.GetById(id);
-        public List<PhieuKho_ChiTiet> GetByPhieu(int maPhieu) => _dal.GetByPhieu(maPhieu);
 
-        // ✅ THÊM MỚI (đây là chỗ đang thiếu)
-       
-        public bool Add(PhieuKho_ChiTiet ct)
-        {
-            if (ct.MaPhieuKho <= 0)
-                throw new ArgumentException("Mã phiếu kho không hợp lệ!");
-            if (ct.MaLinhKien <= 0)
-                throw new ArgumentException("Mã linh kiện không hợp lệ!");
-            if (ct.SoLuong <= 0)
-                throw new ArgumentException("Số lượng phải lớn hơn 0!");
+        public PhieuKho_ChiTiet? GetById(int id) => _dal.GetById(id);  // ✅ Thêm dòng này
 
-            return _dal.Add(ct);
-        }
+        public List<PhieuKho_ChiTiet> GetByPhieu(int id) => _dal.GetByPhieu(id);
 
-        public bool Update(PhieuKho_ChiTiet ct)
-        {
-            if (ct.MaCT <= 0)
-                throw new ArgumentException("Mã chi tiết không hợp lệ!");
-            return _dal.Update(ct);
-        }
+        public bool Add(PhieuKho_ChiTiet model) => _dal.Add(model);
 
-        public bool Delete(int id)
-        {
-            if (id <= 0)
-                throw new ArgumentException("Mã chi tiết không hợp lệ!");
-            return _dal.Delete(id);
-        }
+        public bool Update(PhieuKho_ChiTiet model) => _dal.Update(model);
+
+        public bool Delete(int id) => _dal.Delete(id);
     }
 }
