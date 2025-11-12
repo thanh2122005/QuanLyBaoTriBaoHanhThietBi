@@ -17,7 +17,7 @@ namespace BaiMoiiii.DAL
         // ===================== LẤY TOÀN BỘ CHECKLIST =====================
         public List<PCV_Checklist> GetAll()
         {
-            List<PCV_Checklist> result = new();
+            var list = new List<PCV_Checklist>();
             using SqlConnection conn = new(_conn);
             SqlCommand cmd = new(@"
                 SELECT c.ID, c.MaPhieuCV, c.ItemID, c.DaHoanThanh,
