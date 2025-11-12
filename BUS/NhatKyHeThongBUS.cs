@@ -12,5 +12,10 @@ namespace BaiMoiiii.BUS
             _dal = new NhatKyHeThongDAL(config);
         }
 
+        public List<NhatKyHeThong> GetAll() => _dal.GetAll();
+
+        public NhatKyHeThong? GetById(long id) => _dal.GetById(id);
+
+
     }
 }

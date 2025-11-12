@@ -14,6 +14,56 @@ namespace BaiMoiiii.DAL
             _conn = config.GetConnectionString("DefaultConnection");
         }
 
+        // ===================== GET ALL =====================
+        public List<NhatKyHeThong> GetAll()
+        {
+            var list = new List<NhatKyHeThong>();
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new("SELECT * FROM NhatKyHeThong ORDER BY ThoiGian DESC", conn);
+            conn.Open();
 
-    }
+            SqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                list.Add(new NhatKyHeThong
+                {
+                    MaLog = Convert.ToInt64(dr["MaLog"]),
+                    TenBang = dr["TenBang"].ToString(),
+                    MaBanGhi = Convert.ToInt32(dr["MaBanGhi"]),
+                    HanhDong = dr["HanhDong"].ToString(),
+                    GiaTriCu = dr["GiaTriCu"] == DBNull.Value ? null : dr["GiaTriCu"].ToString(),
+                    GiaTriMoi = dr["GiaTriMoi"] == DBNull.Value ? null : dr["GiaTriMoi"].ToString(),
+                    ThayDoiBoi = dr["ThayDoiBoi"] == DBNull.Value ? null : dr["ThayDoiBoi"].ToString(),
+                    ThoiGian = Convert.ToDateTime(dr["ThoiGian"])
+                });
+            }
+
+            return list;
+        }
+
+        // ===================== GET BY ID =====================
+        public NhatKyHeThong? GetById(long id)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new("SELECT * FROM NhatKyHeThong WHERE MaLog=@id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            conn.Open();
+
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr.Read())
+            {
+                return new NhatKyHeThong
+                {
+                    MaLog = Convert.ToInt64(dr["MaLog"]),
+                    TenBang = dr["TenBang"].ToString(),
+                    MaBanGhi = Convert.ToInt32(dr["MaBanGhi"]),
+                    HanhDong = dr["HanhDong"].ToString(),
+                    GiaTriCu = dr["GiaTriCu"] == DBNull.Value ? null : dr["GiaTriCu"].ToString(),
+                    GiaTriMoi = dr["GiaTriMoi"] == DBNull.Value ? null : dr["GiaTriMoi"].ToString(),
+                    ThayDoiBoi = dr["ThayDoiBoi"] == DBNull.Value ? null : dr["ThayDoiBoi"].ToString(),
+                    ThoiGian = Convert.ToDateTime(dr["ThoiGian"])
+                };
+            }
+
+        }
 }
