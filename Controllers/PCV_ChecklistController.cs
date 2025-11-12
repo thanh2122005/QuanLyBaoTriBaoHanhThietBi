@@ -25,7 +25,7 @@ namespace BaiMoiiii.API.Controllers
 
         // ===================== GET SUMMARY =====================
         [HttpGet("summary")]
-        public IActionResult GetChecklistSummary()
+        public IActionResult GetAll()
         {
             return Ok(_bus.GetSummary());
         }
