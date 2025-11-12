@@ -83,10 +83,5 @@ namespace BaiMoiiii.API.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-<<<<<<< HEAD
-
-
-=======
->>>>>>> origin/Dung
     }
 }

@@ -7,18 +7,13 @@ namespace BaiMoiiii.BUS
     {
         private readonly NhanVienDAL _dal;
 
-<<<<<<< HEAD
-        public NhanVienBUS(IConfiguration config)
+        public NhanVienBUS(string connectionString)
         {
-            _dal = new NhanVienDAL(config);
-=======
-        public NhanVienBUS(string connStr)
-        {
-            _dal = new NhanVienDAL(connStr);
->>>>>>> origin/Dung
+            _dal = new NhanVienDAL(connectionString);
         }
 
         public List<NhanVien> GetAll() => _dal.GetAll();
+
         public NhanVien? GetById(int id) => _dal.GetById(id);
 
         public bool Add(NhanVien nv)
@@ -27,6 +22,7 @@ namespace BaiMoiiii.BUS
                 throw new ArgumentException("Họ tên không được để trống.");
             if (string.IsNullOrWhiteSpace(nv.TrangThai))
                 nv.TrangThai = "Hoạt động";
+
             return _dal.Add(nv);
         }
 
@@ -34,6 +30,7 @@ namespace BaiMoiiii.BUS
         {
             if (nv.MaNV <= 0)
                 throw new ArgumentException("Mã nhân viên không hợp lệ.");
+
             return _dal.Update(nv);
         }
 
@@ -41,6 +38,7 @@ namespace BaiMoiiii.BUS
         {
             if (id <= 0)
                 throw new ArgumentException("Mã nhân viên không hợp lệ.");
+
             return _dal.Delete(id);
         }
 

@@ -40,9 +40,5 @@ namespace BaiMoiiii.BUS
                 throw new ArgumentException("Mã log không hợp lệ.");
             return _dal.Delete(id);
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/Dung
     }
 }

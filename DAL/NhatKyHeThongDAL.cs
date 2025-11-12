@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using BaiMoiiii.MODEL;
 
 namespace BaiMoiiii.DAL
@@ -9,9 +9,9 @@ namespace BaiMoiiii.DAL
     {
         private readonly string _conn;
 
-        public NhatKyHeThongDAL(IConfiguration config)
+        public NhatKyHeThongDAL(string connStr)
         {
-            _conn = config.GetConnectionString("DefaultConnection");
+            _conn = connStr;
         }
 
         // ===================== GET ALL =====================
@@ -65,14 +65,10 @@ namespace BaiMoiiii.DAL
                 };
             }
 
-<<<<<<< HEAD
-           // ===================== ADD =====================
-=======
             return null;
         }
 
         // ===================== ADD =====================
->>>>>>> origin/Dung
         public bool Add(NhatKyHeThong log)
         {
             using SqlConnection conn = new(_conn);
@@ -116,10 +112,7 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/Dung
         // ===================== DELETE =====================
         public bool Delete(long id)
         {
@@ -129,9 +122,5 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/Dung
     }
 }
