@@ -39,6 +39,7 @@ namespace BaiMoiiii.DAL
                     DaHoanThanh = Convert.ToBoolean(reader["DaHoanThanh"]),
                     TenMuc = reader["TenMuc"] as string,
                     MoTa = reader["MoTa"] as string
+
                 });
             }
             return result;
