@@ -65,7 +65,7 @@ namespace BaiMoiiii.DAL
                 };
             }
 
-                    // ===================== ADD =====================
+          // ===================== ADD =====================
         public bool Add(NhatKyHeThong log)
         {
             using SqlConnection conn = new(_conn);
@@ -86,5 +86,30 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
+
+        // ===================== UPDATE =====================
+        public bool Update(NhatKyHeThong log)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"
+                UPDATE NhatKyHeThong
+                SET TenBang=@TenBang, MaBanGhi=@MaBanGhi, HanhDong=@HanhDong,
+                    GiaTriCu=@GiaTriCu, GiaTriMoi=@GiaTriMoi, ThayDoiBoi=@ThayDoiBoi, ThoiGian=@ThoiGian
+                WHERE MaLog=@MaLog", conn);
+
+            cmd.Parameters.AddWithValue("@MaLog", log.MaLog);
+            cmd.Parameters.AddWithValue("@TenBang", log.TenBang);
+            cmd.Parameters.AddWithValue("@MaBanGhi", log.MaBanGhi);
+            cmd.Parameters.AddWithValue("@HanhDong", log.HanhDong);
+            cmd.Parameters.AddWithValue("@GiaTriCu", (object?)log.GiaTriCu ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@GiaTriMoi", (object?)log.GiaTriMoi ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@ThayDoiBoi", (object?)log.ThayDoiBoi ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@ThoiGian", log.ThoiGian);
+
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+
     }
 }

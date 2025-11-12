@@ -27,5 +27,14 @@ namespace BaiMoiiii.BUS
             return _dal.Add(log);
         }
 
+        public bool Update(NhatKyHeThong log)
+        {
+            if (log.MaLog <= 0)
+                throw new ArgumentException("Mã log không hợp lệ.");
+            return _dal.Update(log);
+        }
+
+
+
     }
 }

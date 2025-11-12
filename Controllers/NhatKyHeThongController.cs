@@ -51,5 +51,22 @@ namespace BaiMoiiii.API.Controllers
             }
         }
 
+        // ===================== UPDATE =====================
+        [HttpPut("update/{id}")]
+        public IActionResult Update(long id, [FromBody] NhatKyHeThong model)
+        {
+            try
+            {
+                model.MaLog = id;
+                if (_bus.Update(model))
+                    return Ok(new { message = "Cập nhật thành công!" });
+                return NotFound(new { message = "Không tìm thấy log cần cập nhật." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
     }
 }
