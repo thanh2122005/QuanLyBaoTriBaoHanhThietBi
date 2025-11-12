@@ -65,5 +65,26 @@ namespace BaiMoiiii.DAL
                 };
             }
 
+                    // ===================== ADD =====================
+        public bool Add(NhatKyHeThong log)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"
+                INSERT INTO NhatKyHeThong 
+                    (TenBang, MaBanGhi, HanhDong, GiaTriCu, GiaTriMoi, ThayDoiBoi, ThoiGian)
+                VALUES 
+                    (@TenBang, @MaBanGhi, @HanhDong, @GiaTriCu, @GiaTriMoi, @ThayDoiBoi, @ThoiGian)", conn);
+
+            cmd.Parameters.AddWithValue("@TenBang", log.TenBang);
+            cmd.Parameters.AddWithValue("@MaBanGhi", log.MaBanGhi);
+            cmd.Parameters.AddWithValue("@HanhDong", log.HanhDong);
+            cmd.Parameters.AddWithValue("@GiaTriCu", (object?)log.GiaTriCu ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@GiaTriMoi", (object?)log.GiaTriMoi ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@ThayDoiBoi", (object?)log.ThayDoiBoi ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@ThoiGian", log.ThoiGian);
+
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
         }
+    }
 }

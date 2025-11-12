@@ -35,5 +35,21 @@ namespace BaiMoiiii.API.Controllers
             return Ok(log);
         }
 
+        // ===================== CREATE =====================
+        [HttpPost("create")]
+        public IActionResult Create([FromBody] NhatKyHeThong model)
+        {
+            try
+            {
+                if (_bus.Add(model))
+                    return Ok(new { message = "Thêm log hệ thống thành công!" });
+                return BadRequest(new { message = "Thêm thất bại!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
     }
 }
