@@ -29,7 +29,8 @@ namespace BaiMoiiii.API.Controllers
         [HttpGet("summary")]
         public IActionResult GetSummary()
         {
-            return Ok(_bus.GetSummary());
+            var result = _bus.GetSummary();
+            return Ok(result);
         }
     }
 }
