@@ -12,6 +12,11 @@ namespace BaiMoiiii.BUS
             _dal = new PCV_ChecklistDAL(config);
         }
 
+        public List<PCV_Checklist> GetAll()
+        {
+            Console.WriteLine("BUS: Gọi DAL để lấy danh sách checklist...");
+            return _dal.GetAll();
+        }
 
     }
 }

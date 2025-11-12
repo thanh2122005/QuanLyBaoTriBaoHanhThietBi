@@ -15,6 +15,13 @@ namespace BaiMoiiii.API.Controllers
             _bus = bus;
         }
 
+        [HttpGet("all")]
+        public IActionResult GetAllChecklists()
+        {
+            var data = _bus.GetAll();
+            return data.Any() ? Ok(data) : NotFound(new { message = "Không tìm thấy checklist nào!" });
+        }
+
 
     }
 }
