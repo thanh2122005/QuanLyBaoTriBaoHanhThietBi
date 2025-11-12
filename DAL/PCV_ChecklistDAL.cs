@@ -48,7 +48,7 @@ namespace BaiMoiiii.DAL
         public List<(int MaPhieuCV, int TongSo, int HoanThanh, int ChuaHoanThanh, bool DaHoanTat)> GetSummary()
         {
             var summary = new List<(int, int, int, int, bool)>();
-            using SqlConnection connection = new(_connectionString);
+            using SqlConnection conn = new(_conn);
             SqlCommand command = new(@"
                 SELECT MaPhieuCV,
                        COUNT(*) AS TongSo,
