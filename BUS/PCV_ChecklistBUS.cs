@@ -18,5 +18,28 @@ namespace BaiMoiiii.BUS
             return _dal.GetAll();
         }
 
+        public object GetSummary()
+        {
+            var data = _dal.GetSummary();
+            int totalForms = data.Count;
+            int done = data.Count(x => x.DaHoanTat);
+            int notDone = data.Count(x => !x.DaHoanTat);
+
+            return new
+            {
+                TongPhieu = totalForms,
+                DaHoanTat = done,
+                ChuaHoanTat = notDone,
+                ChiTiet = data.Select(x => new
+                {
+                    x.MaPhieuCV,
+                    x.TongSo,
+                    x.HoanThanh,
+                    x.ChuaHoanThanh,
+                    x.DaHoanTat
+                }).ToList()
+            };
+        }
+
     }
 }
