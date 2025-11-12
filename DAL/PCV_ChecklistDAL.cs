@@ -19,7 +19,7 @@ namespace BaiMoiiii.DAL
         {
             List<PCV_Checklist> result = new();
             using SqlConnection conn = new(_conn);
-            SqlCommand command = new(@"
+            SqlCommand cmd = new(@"
                 SELECT c.ID, c.MaPhieuCV, c.ItemID, c.DaHoanThanh,
                        i.TenMuc, i.MoTa
                 FROM PCV_Checklist c
@@ -49,7 +49,7 @@ namespace BaiMoiiii.DAL
         {
             var summary = new List<(int, int, int, int, bool)>();
             using SqlConnection conn = new(_conn);
-            SqlCommand command = new(@"
+            SqlCommand cmd = new(@"
                 SELECT MaPhieuCV,
                        COUNT(*) AS TongSo,
                        SUM(CASE WHEN DaHoanThanh = 1 THEN 1 ELSE 0 END) AS HoanThanh,
