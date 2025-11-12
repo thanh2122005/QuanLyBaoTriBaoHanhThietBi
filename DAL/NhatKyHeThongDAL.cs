@@ -65,7 +65,7 @@ namespace BaiMoiiii.DAL
                 };
             }
 
-          // ===================== ADD =====================
+           // ===================== ADD =====================
         public bool Add(NhatKyHeThong log)
         {
             using SqlConnection conn = new(_conn);
@@ -109,7 +109,15 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
-
+        // ===================== DELETE =====================
+        public bool Delete(long id)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new("DELETE FROM NhatKyHeThong WHERE MaLog=@id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
 
     }
 }

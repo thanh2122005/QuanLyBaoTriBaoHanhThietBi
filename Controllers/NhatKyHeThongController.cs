@@ -68,5 +68,22 @@ namespace BaiMoiiii.API.Controllers
             }
         }
 
+        // ===================== DELETE =====================
+        [HttpDelete("delete/{id}")]
+        public IActionResult Delete(long id)
+        {
+            try
+            {
+                if (_bus.Delete(id))
+                    return Ok(new { message = "Xóa log hệ thống thành công!" });
+                return NotFound(new { message = "Không tìm thấy log để xóa." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
     }
 }
