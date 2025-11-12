@@ -27,9 +27,10 @@ namespace BaiMoiiii.DAL
 
             connection.Open();
             Console.WriteLine("Đang truy vấn dữ liệu checklist...");
-            SqlDataReader reader = command.ExecuteReader();
+            SqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
 
-            while (reader.Read())
+                while (reader.Read())
             {
                 result.Add(new PCV_Checklist
                 {
@@ -59,8 +60,9 @@ namespace BaiMoiiii.DAL
                 GROUP BY MaPhieuCV", connection);
 
             connection.Open();
-            SqlDataReader reader = command.ExecuteReader();
-            while (reader.Read())
+            SqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+                while (reader.Read())
             {
                 summary.Add((
                     Convert.ToInt32(reader["MaPhieuCV"]),
