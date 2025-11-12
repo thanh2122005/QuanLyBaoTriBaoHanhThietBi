@@ -36,6 +36,9 @@ namespace BaiMoiiii.BUS
                 throw new ArgumentException("Mã lịch không hợp lệ.");
             return _dal.Delete(id);
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/Dung
     }
 }

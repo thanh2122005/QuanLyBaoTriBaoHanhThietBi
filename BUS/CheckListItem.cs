@@ -32,6 +32,7 @@ namespace BaiMoiiii.BUS
                 throw new ArgumentException("Mã item không hợp lệ.");
             return _dal.Update(item);
         }
+<<<<<<< HEAD
 
         public bool Delete(int id)
         {
@@ -39,6 +40,14 @@ namespace BaiMoiiii.BUS
                 throw new ArgumentException("Mã item không hợp lệ.");
             return _dal.Delete(id);
         }
+=======
+>>>>>>> origin/Dung
 
+        public bool Delete(int id)
+        {
+            if (id <= 0)
+                throw new ArgumentException("Mã item không hợp lệ.");
+            return _dal.Delete(id);
+        }
     }
 }

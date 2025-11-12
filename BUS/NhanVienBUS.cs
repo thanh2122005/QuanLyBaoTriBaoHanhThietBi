@@ -7,9 +7,15 @@ namespace BaiMoiiii.BUS
     {
         private readonly NhanVienDAL _dal;
 
+<<<<<<< HEAD
         public NhanVienBUS(IConfiguration config)
         {
             _dal = new NhanVienDAL(config);
+=======
+        public NhanVienBUS(string connStr)
+        {
+            _dal = new NhanVienDAL(connStr);
+>>>>>>> origin/Dung
         }
 
         public List<NhanVien> GetAll() => _dal.GetAll();

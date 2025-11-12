@@ -33,7 +33,6 @@ namespace BaiMoiiii.DAL
             return list;
         }
 
-
         // ===================== THÊM =====================
         public bool Add(ChecklistItem item)
         {
@@ -58,6 +57,7 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
+<<<<<<< HEAD
 
         // ===================== XÓA =====================
         public bool Delete(int id)
@@ -68,6 +68,17 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
+=======
+>>>>>>> origin/Dung
 
+        // ===================== XÓA =====================
+        public bool Delete(int id)
+        {
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new("DELETE FROM ChecklistItem WHERE ItemID=@id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            conn.Open();
+            return cmd.ExecuteNonQuery() > 0;
+        }
     }
 }

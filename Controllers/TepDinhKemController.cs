@@ -6,11 +6,11 @@ namespace BaiMoiiii.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LichBaoTriController : ControllerBase
+    public class TepDinhKemController : ControllerBase
     {
-        private readonly LichBaoTriBUS _bus;
+        private readonly TepDinhKemBUS _bus;
 
-        public LichBaoTriController(LichBaoTriBUS bus)
+        public TepDinhKemController(TepDinhKemBUS bus)
         {
             _bus = bus;
         }
@@ -19,28 +19,28 @@ namespace BaiMoiiii.API.Controllers
         public IActionResult GetAll()
         {
             var list = _bus.GetAll();
-            if (list == null || !list.Any())
-                return NotFound(new { message = "Không có dữ liệu." });
+            if (!list.Any())
+                return NotFound(new { message = "Không có tệp nào trong hệ thống!" });
             return Ok(list);
         }
 
         [HttpGet("get/{id}")]
         public IActionResult GetById(int id)
         {
-            var item = _bus.GetById(id);
-            if (item == null)
-                return NotFound(new { message = "Không tìm thấy bản ghi." });
-            return Ok(item);
+            var t = _bus.GetById(id);
+            if (t == null)
+                return NotFound(new { message = "Không tìm thấy tệp!" });
+            return Ok(t);
         }
 
         [HttpPost("create")]
-        public IActionResult Create([FromBody] LichBaoTri model)
+        public IActionResult Create([FromBody] TepDinhKem model)
         {
             try
             {
                 if (_bus.Add(model))
-                    return Ok(new { message = "Thêm lịch bảo trì thành công!" });
-                return BadRequest(new { message = "Thêm thất bại." });
+                    return Ok(new { message = "Thêm tệp đính kèm thành công!" });
+                return BadRequest(new { message = "Không thể thêm tệp!" });
             }
             catch (Exception ex)
             {
@@ -48,19 +48,15 @@ namespace BaiMoiiii.API.Controllers
             }
         }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/Dung
         [HttpPut("update/{id}")]
-        public IActionResult Update(int id, [FromBody] LichBaoTri model)
+        public IActionResult Update(int id, [FromBody] TepDinhKem model)
         {
             try
             {
-                model.MaLich = id;
+                model.MaTep = id;
                 if (_bus.Update(model))
-                    return Ok(new { message = "Cập nhật thành công!" });
-                return NotFound(new { message = "Không tìm thấy bản ghi cần cập nhật." });
+                    return Ok(new { message = "Cập nhật tệp đính kèm thành công!" });
+                return NotFound(new { message = "Không tìm thấy tệp để cập nhật!" });
             }
             catch (Exception ex)
             {
@@ -74,17 +70,13 @@ namespace BaiMoiiii.API.Controllers
             try
             {
                 if (_bus.Delete(id))
-                    return Ok(new { message = "Xóa thành công!" });
-                return NotFound(new { message = "Không tìm thấy bản ghi để xóa." });
+                    return Ok(new { message = "Xóa tệp đính kèm thành công!" });
+                return NotFound(new { message = "Không tìm thấy tệp để xóa!" });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/Dung
     }
 }

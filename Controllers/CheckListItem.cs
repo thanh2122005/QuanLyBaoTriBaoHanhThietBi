@@ -65,7 +65,10 @@ namespace BaiMoiiii.Controllers
             }
         }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/Dung
         // ===================== DELETE =====================
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)

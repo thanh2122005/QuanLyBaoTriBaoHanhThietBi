@@ -1,6 +1,6 @@
-﻿using BaiMoiiii.DAL;
+﻿using System.Collections.Generic;
+using BaiMoiiii.DAL;
 using BaiMoiiii.MODEL;
-using System.Collections.Generic;
 
 namespace BaiMoiiii.BUS
 {
@@ -8,40 +8,19 @@ namespace BaiMoiiii.BUS
     {
         private readonly BaoHanhDAL _dal;
 
-        public BaoHanhBUS(BaoHanhDAL dal)
+        public BaoHanhBUS(string connStr)
         {
-            _dal = dal;
+            _dal = new BaoHanhDAL(connStr);
         }
 
         public List<BaoHanh> GetAll() => _dal.GetAll();
 
         public BaoHanh? GetById(int id) => _dal.GetById(id);
 
-        public bool Create(BaoHanh bh)
-        {
-            if (string.IsNullOrEmpty(bh.NhaCungCap))
-                return false;
-            if (bh.NgayKetThuc < bh.NgayBatDau)
-                return false;
+        public bool Add(BaoHanh bh) => _dal.Insert(bh);
 
-            return _dal.Create(bh);
-        }
+        public bool Update(BaoHanh bh) => _dal.Update(bh);
 
-        public bool Update(BaoHanh bh)
-        {
-            if (bh.MaBaoHanh <= 0)
-                return false;
-            if (bh.NgayKetThuc < bh.NgayBatDau)
-                return false;
-
-            return _dal.Update(bh);
-        }
-
-        public bool Delete(int id)
-        {
-            if (id <= 0)
-                return false;
-            return _dal.Delete(id);
-        }
+        public bool Delete(int id) => _dal.Delete(id);
     }
 }

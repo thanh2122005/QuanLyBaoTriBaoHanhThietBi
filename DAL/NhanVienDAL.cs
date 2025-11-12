@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+<<<<<<< HEAD
 using System.Data.SqlClient;
+=======
+using Microsoft.Data.SqlClient; 
+>>>>>>> origin/Dung
 using BaiMoiiii.MODEL;
 
 namespace BaiMoiiii.DAL
@@ -9,15 +13,26 @@ namespace BaiMoiiii.DAL
     {
         private readonly string _conn;
 
+<<<<<<< HEAD
         public NhanVienDAL(IConfiguration config)
         {
             _conn = config.GetConnectionString("DefaultConnection");
+=======
+        // ✅ Nhận chuỗi kết nối trực tiếp từ Program.cs
+        public NhanVienDAL(string connStr)
+        {
+            _conn = connStr;
+>>>>>>> origin/Dung
         }
 
         // ==================== GET ALL ====================
         public List<NhanVien> GetAll()
         {
             var list = new List<NhanVien>();
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Dung
             using SqlConnection conn = new(_conn);
             SqlCommand cmd = new("SELECT * FROM NhanVien", conn);
             conn.Open();
@@ -42,7 +57,11 @@ namespace BaiMoiiii.DAL
         public NhanVien? GetById(int id)
         {
             using SqlConnection conn = new(_conn);
+<<<<<<< HEAD
             SqlCommand cmd = new("SELECT * FROM NhanVien WHERE MaNV=@id", conn);
+=======
+            SqlCommand cmd = new("SELECT * FROM NhanVien WHERE MaNV = @id", conn);
+>>>>>>> origin/Dung
             cmd.Parameters.AddWithValue("@id", id);
             conn.Open();
 
@@ -84,9 +103,18 @@ namespace BaiMoiiii.DAL
         {
             using SqlConnection conn = new(_conn);
             SqlCommand cmd = new(@"
+<<<<<<< HEAD
                 UPDATE NhanVien 
                 SET HoTen=@HoTen, SoDienThoai=@SoDienThoai, Email=@Email, TrangThai=@TrangThai
                 WHERE MaNV=@MaNV", conn);
+=======
+                UPDATE NhanVien
+                SET HoTen = @HoTen,
+                    SoDienThoai = @SoDienThoai,
+                    Email = @Email,
+                    TrangThai = @TrangThai
+                WHERE MaNV = @MaNV", conn);
+>>>>>>> origin/Dung
 
             cmd.Parameters.AddWithValue("@MaNV", nv.MaNV);
             cmd.Parameters.AddWithValue("@HoTen", nv.HoTen);
@@ -102,8 +130,14 @@ namespace BaiMoiiii.DAL
         public bool Delete(int id)
         {
             using SqlConnection conn = new(_conn);
+<<<<<<< HEAD
             SqlCommand cmd = new("DELETE FROM NhanVien WHERE MaNV=@id", conn);
             cmd.Parameters.AddWithValue("@id", id);
+=======
+            SqlCommand cmd = new("DELETE FROM NhanVien WHERE MaNV = @id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
+
+>>>>>>> origin/Dung
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
@@ -113,6 +147,10 @@ namespace BaiMoiiii.DAL
         {
             using SqlConnection conn = new(_conn);
             SqlCommand cmd = new("SELECT COUNT(*) FROM NhanVien WHERE TrangThai = N'Hoạt động'", conn);
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Dung
             conn.Open();
             return (int)cmd.ExecuteScalar();
         }
