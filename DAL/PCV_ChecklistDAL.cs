@@ -18,7 +18,7 @@ namespace BaiMoiiii.DAL
         public List<PCV_Checklist> GetAll()
         {
             List<PCV_Checklist> result = new();
-            using SqlConnection connection = new(_connectionString);
+            using SqlConnection conn = new(_conn);
             SqlCommand command = new(@"
                 SELECT c.ID, c.MaPhieuCV, c.ItemID, c.DaHoanThanh,
                        i.TenMuc, i.MoTa
