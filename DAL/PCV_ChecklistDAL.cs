@@ -26,7 +26,6 @@ namespace BaiMoiiii.DAL
                 LEFT JOIN ChecklistItem i ON c.ItemID = i.ItemID", connection);
 
             connection.Open();
-            Console.WriteLine("Đang truy vấn dữ liệu checklist...");
             SqlDataReader dr = cmd.ExecuteReader();
             while (dr.Read())
 
