@@ -17,7 +17,7 @@ namespace BaiMoiiii.API.Controllers
 
         // ===================== GET ALL =====================
         [HttpGet("get-all")]
-        public IActionResult GetAllChecklists()
+        public IActionResult GetAll()
         {
             var list = _bus.GetAll();
             if (!list.Any())
