@@ -2,86 +2,66 @@
 using BaiMoiiii.BUS;
 using BaiMoiiii.Models;
 
-namespace BaiMoiiii.Controllers
+namespace BaiMoiiii.API.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class KhachHangController : ControllerBase
     {
-        private readonly KhachHangBus _bus;
+        private readonly KhachHangBUS _bus;
 
-        public KhachHangController(IConfiguration config)
+        public KhachHangController(KhachHangBUS bus)
         {
-            _bus = new KhachHangBus(config);
+            _bus = bus;
         }
 
-        // ===================== GET ALL =====================
         [HttpGet("get-all")]
         public IActionResult GetAll()
         {
-            try
-            {
-                var list = _bus.GetAll();
-                return Ok(list);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var data = _bus.GetAll();
+            if (!data.Any()) return NotFound(new { message = "Không có khách hàng nào!" });
+            return Ok(data);
         }
 
-
-        // ===================== GET BY ID ====================
         [HttpGet("get/{id}")]
         public IActionResult GetById(int id)
         {
-            try
-            {
-                var kh = _bus.GetById(id);
-                if (kh == null)
-                    return NotFound(new { message = "Không tìm thấy khách hàng." });
-                return Ok(kh);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var item = _bus.GetById(id);
+            if (item == null) return NotFound(new { message = "Không tìm thấy khách hàng!" });
+            return Ok(item);
         }
 
-
-        // ===================== ADD ====================
         [HttpPost("create")]
-        public IActionResult Add([FromBody] KhachHang kh)
+        public IActionResult Create([FromBody] KhachHang kh)
         {
             try
             {
                 if (_bus.Add(kh))
                     return Ok(new { message = "Thêm khách hàng thành công!" });
-                return BadRequest(new { message = "Không thể thêm khách hàng." });
+                return BadRequest(new { message = "Không thể thêm khách hàng!" });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { error = ex.Message });
             }
         }
 
-        // ===================== UPDATE ====================
-        [HttpPut("update")]
-        public IActionResult Update([FromBody] KhachHang kh)
+        [HttpPut("update/{id}")]
+        public IActionResult Update(int id, [FromBody] KhachHang kh)
         {
             try
             {
+                kh.MaKH = id;
                 if (_bus.Update(kh))
-                    return Ok(new { message = "Cập nhật khách hàng thành công!" });
-                return BadRequest(new { message = "Không thể cập nhật khách hàng." });
+                    return Ok(new { message = "Cập nhật thành công!" });
+                return NotFound(new { message = "Không tìm thấy khách hàng để cập nhật!" });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { error = ex.Message });
             }
         }
 
-        // ===================== DELETE ====================
         [HttpDelete("delete/{id}")]
         public IActionResult Delete(int id)
         {
@@ -89,13 +69,12 @@ namespace BaiMoiiii.Controllers
             {
                 if (_bus.Delete(id))
                     return Ok(new { message = "Xóa khách hàng thành công!" });
-                return BadRequest(new { message = "Không thể xóa khách hàng." });
+                return NotFound(new { message = "Không tìm thấy khách hàng để xóa!" });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { error = ex.Message });
             }
         }
-
     }
 }

@@ -122,7 +122,10 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> origin/Dung
     }
 }

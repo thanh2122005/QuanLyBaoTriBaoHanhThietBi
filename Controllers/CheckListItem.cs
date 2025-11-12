@@ -64,8 +64,6 @@ namespace BaiMoiiii.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
-
         // ===================== DELETE =====================
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)

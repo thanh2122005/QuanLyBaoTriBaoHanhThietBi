@@ -14,65 +14,61 @@ namespace BaiMoiiii.DAL
             _conn = config.GetConnectionString("DefaultConnection");
         }
 
-        // ===================== LẤY TOÀN BỘ CHECKLIST =====================
+        // ===================== GET ALL =====================
         public List<PCV_Checklist> GetAll()
         {
-            List<PCV_Checklist> result = new();
-            using SqlConnection connection = new(_connectionString);
-            SqlCommand command = new(@"
+            var list = new List<PCV_Checklist>();
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"
                 SELECT c.ID, c.MaPhieuCV, c.ItemID, c.DaHoanThanh,
                        i.TenMuc, i.MoTa
                 FROM PCV_Checklist c
-                LEFT JOIN ChecklistItem i ON c.ItemID = i.ItemID", connection);
+                LEFT JOIN ChecklistItem i ON c.ItemID = i.ItemID", conn);
 
-            connection.Open();
-            Console.WriteLine("Đang truy vấn dữ liệu checklist...");
-            SqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
+            conn.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
             {
-                result.Add(new PCV_Checklist
+                list.Add(new PCV_Checklist
                 {
-                    ID = Convert.ToInt32(reader["ID"]),
-                    MaPhieuCV = Convert.ToInt32(reader["MaPhieuCV"]),
-                    ItemID = Convert.ToInt32(reader["ItemID"]),
-                    DaHoanThanh = Convert.ToBoolean(reader["DaHoanThanh"]),
-                    TenMuc = reader["TenMuc"] as string,
-                    MoTa = reader["MoTa"] as string
+                    ID = Convert.ToInt32(dr["ID"]),
+                    MaPhieuCV = Convert.ToInt32(dr["MaPhieuCV"]),
+                    ItemID = Convert.ToInt32(dr["ItemID"]),
+                    DaHoanThanh = Convert.ToBoolean(dr["DaHoanThanh"]),
+                    TenMuc = dr["TenMuc"] == DBNull.Value ? null : dr["TenMuc"].ToString(),
+                    MoTa = dr["MoTa"] == DBNull.Value ? null : dr["MoTa"].ToString()
                 });
             }
-            return result;
+            return list;
         }
 
-        // ===================== TỔNG HỢP CHECKLIST =====================
+        // ===================== GET SUMMARY =====================
         public List<(int MaPhieuCV, int TongSo, int HoanThanh, int ChuaHoanThanh, bool DaHoanTat)> GetSummary()
         {
-            var summary = new List<(int, int, int, int, bool)>();
-            using SqlConnection connection = new(_connectionString);
-            SqlCommand command = new(@"
+            var list = new List<(int, int, int, int, bool)>();
+            using SqlConnection conn = new(_conn);
+            SqlCommand cmd = new(@"
                 SELECT MaPhieuCV,
                        COUNT(*) AS TongSo,
                        SUM(CASE WHEN DaHoanThanh = 1 THEN 1 ELSE 0 END) AS HoanThanh,
                        SUM(CASE WHEN DaHoanThanh = 0 THEN 1 ELSE 0 END) AS ChuaHoanThanh,
                        CASE WHEN MIN(CASE WHEN DaHoanThanh = 1 THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END AS DaHoanTat
                 FROM PCV_Checklist
-                GROUP BY MaPhieuCV", connection);
+                GROUP BY MaPhieuCV", conn);
 
-            connection.Open();
-            SqlDataReader reader = command.ExecuteReader();
-            while (reader.Read())
+            conn.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
             {
-                summary.Add((
-                    Convert.ToInt32(reader["MaPhieuCV"]),
-                    Convert.ToInt32(reader["TongSo"]),
-                    Convert.ToInt32(reader["HoanThanh"]),
-                    Convert.ToInt32(reader["ChuaHoanThanh"]),
-                    Convert.ToBoolean(reader["DaHoanTat"])
+                list.Add((
+                    Convert.ToInt32(dr["MaPhieuCV"]),
+                    Convert.ToInt32(dr["TongSo"]),
+                    Convert.ToInt32(dr["HoanThanh"]),
+                    Convert.ToInt32(dr["ChuaHoanThanh"]),
+                    Convert.ToBoolean(dr["DaHoanTat"])
                 ));
             }
-            return summary;
+            return list;
         }
-
-
     }
 }

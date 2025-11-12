@@ -5,92 +5,97 @@ namespace BaiMoiiii.DAL
 {
     public class KhachHangDAL
     {
-        private readonly string? _conn;
+        private readonly string _connectionString;
 
-        public KhachHangDAL(IConfiguration config)
+        public KhachHangDAL(string connectionString)
         {
-            _conn = config.GetConnectionString("DefaultConnection");
+            _connectionString = connectionString;
         }
 
+        // 🔹 Lấy tất cả khách hàng
         public List<KhachHang> GetAll()
         {
             var list = new List<KhachHang>();
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new("SELECT * FROM KhachHang", conn);
+            using var conn = new SqlConnection(_connectionString);
+            var cmd = new SqlCommand("SELECT * FROM KhachHang ORDER BY MaKH DESC", conn);
             conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            while (dr.Read())
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
                 list.Add(new KhachHang
                 {
-                    MaKH = Convert.ToInt32(dr["MaKH"]),
-                    TenKH = dr["TenKH"].ToString() ?? "",
-                    Email = dr["Email"] == DBNull.Value ? null : dr["Email"].ToString(),
-                    DienThoai = dr["DienThoai"] == DBNull.Value ? null : dr["DienThoai"].ToString(),
-                    DiaChi = dr["DiaChi"] == DBNull.Value ? null : dr["DiaChi"].ToString()
+                    MaKH = Convert.ToInt32(reader["MaKH"]),
+                    TenKH = reader["TenKH"].ToString() ?? "",
+                    DiaChi = reader["DiaChi"] == DBNull.Value ? null : reader["DiaChi"].ToString(),
+                    DienThoai = reader["DienThoai"] == DBNull.Value ? null : reader["DienThoai"].ToString(),
+                    Email = reader["Email"] == DBNull.Value ? null : reader["Email"].ToString()
                 });
             }
             return list;
         }
 
+        // 🔹 Lấy theo ID
         public KhachHang? GetById(int id)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new("SELECT * FROM KhachHang WHERE MaKH=@id", conn);
+            using var conn = new SqlConnection(_connectionString);
+            var cmd = new SqlCommand("SELECT * FROM KhachHang WHERE MaKH=@id", conn);
             cmd.Parameters.AddWithValue("@id", id);
             conn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
             {
                 return new KhachHang
                 {
-                    MaKH = Convert.ToInt32(dr["MaKH"]),
-                    TenKH = dr["TenKH"].ToString() ?? "",
-                    Email = dr["Email"] == DBNull.Value ? null : dr["Email"].ToString(),
-                    DienThoai = dr["DienThoai"] == DBNull.Value ? null : dr["DienThoai"].ToString(),
-                    DiaChi = dr["DiaChi"] == DBNull.Value ? null : dr["DiaChi"].ToString()
+                    MaKH = Convert.ToInt32(reader["MaKH"]),
+                    TenKH = reader["TenKH"].ToString() ?? "",
+                    DiaChi = reader["DiaChi"] == DBNull.Value ? null : reader["DiaChi"].ToString(),
+                    DienThoai = reader["DienThoai"] == DBNull.Value ? null : reader["DienThoai"].ToString(),
+                    Email = reader["Email"] == DBNull.Value ? null : reader["Email"].ToString()
                 };
             }
             return null;
         }
 
-
+        // 🔹 Thêm mới
         public bool Add(KhachHang kh)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"INSERT INTO KhachHang (TenKH, Email, DienThoai, DiaChi)
-                                   VALUES (@ten, @email, @sdt, @diachi)", conn);
-            cmd.Parameters.AddWithValue("@ten", kh.TenKH);
-            cmd.Parameters.AddWithValue("@email", (object?)kh.Email ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@sdt", (object?)kh.DienThoai ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@diachi", (object?)kh.DiaChi ?? DBNull.Value);
+            using var conn = new SqlConnection(_connectionString);
+            var cmd = new SqlCommand(@"
+                INSERT INTO KhachHang (TenKH, DiaChi, DienThoai, Email)
+                VALUES (@TenKH, @DiaChi, @DienThoai, @Email)", conn);
+            cmd.Parameters.AddWithValue("@TenKH", kh.TenKH);
+            cmd.Parameters.AddWithValue("@DiaChi", (object?)kh.DiaChi ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@DienThoai", (object?)kh.DienThoai ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@Email", (object?)kh.Email ?? DBNull.Value);
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
 
+        // 🔹 Cập nhật
         public bool Update(KhachHang kh)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new(@"UPDATE KhachHang 
-                                   SET TenKH=@ten, Email=@email, DienThoai=@sdt, DiaChi=@diachi 
-                                   WHERE MaKH=@id", conn);
-            cmd.Parameters.AddWithValue("@id", kh.MaKH);
-            cmd.Parameters.AddWithValue("@ten", kh.TenKH);
-            cmd.Parameters.AddWithValue("@email", (object?)kh.Email ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@sdt", (object?)kh.DienThoai ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@diachi", (object?)kh.DiaChi ?? DBNull.Value);
+            using var conn = new SqlConnection(_connectionString);
+            var cmd = new SqlCommand(@"
+                UPDATE KhachHang
+                SET TenKH=@TenKH, DiaChi=@DiaChi, DienThoai=@DienThoai, Email=@Email
+                WHERE MaKH=@MaKH", conn);
+            cmd.Parameters.AddWithValue("@MaKH", kh.MaKH);
+            cmd.Parameters.AddWithValue("@TenKH", kh.TenKH);
+            cmd.Parameters.AddWithValue("@DiaChi", (object?)kh.DiaChi ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@DienThoai", (object?)kh.DienThoai ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@Email", (object?)kh.Email ?? DBNull.Value);
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
 
+        // 🔹 Xóa
         public bool Delete(int id)
         {
-            using SqlConnection conn = new(_conn);
-            SqlCommand cmd = new("DELETE FROM KhachHang WHERE MaKH=@id", conn);
+            using var conn = new SqlConnection(_connectionString);
+            var cmd = new SqlCommand("DELETE FROM KhachHang WHERE MaKH=@id", conn);
             cmd.Parameters.AddWithValue("@id", id);
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
-
     }
 }

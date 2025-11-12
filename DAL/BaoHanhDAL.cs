@@ -1,26 +1,31 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using BaiMoiiii.MODEL;
-using System.Data;
 
 namespace BaiMoiiii.DAL
 {
     public class BaoHanhDAL
     {
-        private readonly string _connectionString;
-
-        public BaoHanhDAL(string connectionString)
+        private readonly string _connStr;
+        public BaoHanhDAL(string connStr)
         {
-            _connectionString = connectionString;
+            _connStr = connStr;
         }
 
-        // 🔹 Lấy tất cả
+        // ================== LẤY TẤT CẢ ==================
         public List<BaoHanh> GetAll()
         {
             var list = new List<BaoHanh>();
-            using (var conn = new SqlConnection(_connectionString))
+            string sql = @"
+                SELECT b.*, t.TenTaiSan 
+                FROM BaoHanh b 
+                LEFT JOIN TaiSan t ON b.MaTaiSan = t.MaTaiSan";
+
+            using (var conn = new SqlConnection(_connStr))
             {
                 conn.Open();
-                var cmd = new SqlCommand("SELECT * FROM BaoHanh", conn);
+                using (var cmd = new SqlCommand(sql, conn))
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -28,11 +33,12 @@ namespace BaiMoiiii.DAL
                         list.Add(new BaoHanh
                         {
                             MaBaoHanh = (int)reader["MaBaoHanh"],
-                            NhaCungCap = reader["NhaCungCap"].ToString() ?? "",
-                            NgayBatDau = Convert.ToDateTime(reader["NgayBatDau"]),
-                            NgayKetThuc = Convert.ToDateTime(reader["NgayKetThuc"]),
-                            DieuKhoan = reader["DieuKhoan"]?.ToString(),
-                            MaNV = reader["MaNV"] == DBNull.Value ? null : (int?)reader["MaNV"]
+                            NhaCungCap = reader["NhaCungCap"].ToString(),
+                            NgayBatDau = (DateTime)reader["NgayBatDau"],
+                            NgayKetThuc = (DateTime)reader["NgayKetThuc"],
+                            DieuKhoan = reader["DieuKhoan"] == DBNull.Value ? null : reader["DieuKhoan"].ToString(),
+                            MaTaiSan = reader["MaTaiSan"] == DBNull.Value ? null : (int?)reader["MaTaiSan"],
+                            TenTaiSan = reader["TenTaiSan"] == DBNull.Value ? null : reader["TenTaiSan"].ToString()
                         });
                     }
                 }
@@ -40,85 +46,97 @@ namespace BaiMoiiii.DAL
             return list;
         }
 
-        // 🔹 Lấy theo ID
+        // ================== LẤY THEO ID ==================
         public BaoHanh? GetById(int id)
         {
             BaoHanh? bh = null;
-            using (var conn = new SqlConnection(_connectionString))
+            string sql = @"SELECT b.*, t.TenTaiSan 
+                           FROM BaoHanh b 
+                           LEFT JOIN TaiSan t ON b.MaTaiSan = t.MaTaiSan
+                           WHERE b.MaBaoHanh = @id";
+
+            using (var conn = new SqlConnection(_connStr))
             {
                 conn.Open();
-                var cmd = new SqlCommand("SELECT * FROM BaoHanh WHERE MaBaoHanh=@id", conn);
-                cmd.Parameters.AddWithValue("@id", id);
-                using (var reader = cmd.ExecuteReader())
+                using (var cmd = new SqlCommand(sql, conn))
                 {
-                    if (reader.Read())
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        bh = new BaoHanh
+                        if (reader.Read())
                         {
-                            MaBaoHanh = (int)reader["MaBaoHanh"],
-                            NhaCungCap = reader["NhaCungCap"].ToString() ?? "",
-                            NgayBatDau = Convert.ToDateTime(reader["NgayBatDau"]),
-                            NgayKetThuc = Convert.ToDateTime(reader["NgayKetThuc"]),
-                            DieuKhoan = reader["DieuKhoan"]?.ToString(),
-                            MaNV = reader["MaNV"] == DBNull.Value ? null : (int?)reader["MaNV"]
-                        };
+                            bh = new BaoHanh
+                            {
+                                MaBaoHanh = (int)reader["MaBaoHanh"],
+                                NhaCungCap = reader["NhaCungCap"].ToString(),
+                                NgayBatDau = (DateTime)reader["NgayBatDau"],
+                                NgayKetThuc = (DateTime)reader["NgayKetThuc"],
+                                DieuKhoan = reader["DieuKhoan"] == DBNull.Value ? null : reader["DieuKhoan"].ToString(),
+                                MaTaiSan = reader["MaTaiSan"] == DBNull.Value ? null : (int?)reader["MaTaiSan"],
+                                TenTaiSan = reader["TenTaiSan"] == DBNull.Value ? null : reader["TenTaiSan"].ToString()
+                            };
+                        }
+
                     }
                 }
             }
             return bh;
         }
 
-        // 🔹 Thêm mới
-        public bool Create(BaoHanh bh)
+        // ================== THÊM MỚI ==================
+        public bool Insert(BaoHanh bh)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            string sql = @"INSERT INTO BaoHanh (NhaCungCap, NgayBatDau, NgayKetThuc, DieuKhoan, MaTaiSan)
+                           VALUES (@NCC, @NBD, @NKT, @DK, @MTS)";
+            using (var conn = new SqlConnection(_connStr))
             {
                 conn.Open();
-                var sql = @"INSERT INTO BaoHanh (NhaCungCap, NgayBatDau, NgayKetThuc, DieuKhoan, MaNV)
-                            VALUES (@NhaCungCap, @NgayBatDau, @NgayKetThuc, @DieuKhoan, @MaNV)";
-                var cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@NhaCungCap", bh.NhaCungCap);
-                cmd.Parameters.AddWithValue("@NgayBatDau", bh.NgayBatDau);
-                cmd.Parameters.AddWithValue("@NgayKetThuc", bh.NgayKetThuc);
-                cmd.Parameters.AddWithValue("@DieuKhoan", (object?)bh.DieuKhoan ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@MaNV", (object?)bh.MaNV ?? DBNull.Value);
-                return cmd.ExecuteNonQuery() > 0;
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@NCC", bh.NhaCungCap);
+                    cmd.Parameters.AddWithValue("@NBD", bh.NgayBatDau);
+                    cmd.Parameters.AddWithValue("@NKT", bh.NgayKetThuc);
+                    cmd.Parameters.AddWithValue("@DK", (object)bh.DieuKhoan ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@MTS", (object?)bh.MaTaiSan ?? DBNull.Value);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
             }
         }
 
-        // 🔹 Cập nhật
+        // ================== CẬP NHẬT ==================
         public bool Update(BaoHanh bh)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            string sql = @"UPDATE BaoHanh 
+                           SET NhaCungCap=@NCC, NgayBatDau=@NBD, NgayKetThuc=@NKT, DieuKhoan=@DK, MaTaiSan=@MTS
+                           WHERE MaBaoHanh=@ID";
+            using (var conn = new SqlConnection(_connStr))
             {
                 conn.Open();
-                var sql = @"UPDATE BaoHanh
-                            SET NhaCungCap=@NhaCungCap,
-                                NgayBatDau=@NgayBatDau,
-                                NgayKetThuc=@NgayKetThuc,
-                                DieuKhoan=@DieuKhoan,
-                                MaNV=@MaNV
-                            WHERE MaBaoHanh=@MaBaoHanh";
-                var cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@NhaCungCap", bh.NhaCungCap);
-                cmd.Parameters.AddWithValue("@NgayBatDau", bh.NgayBatDau);
-                cmd.Parameters.AddWithValue("@NgayKetThuc", bh.NgayKetThuc);
-                cmd.Parameters.AddWithValue("@DieuKhoan", (object?)bh.DieuKhoan ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@MaNV", (object?)bh.MaNV ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@MaBaoHanh", bh.MaBaoHanh);
-                return cmd.ExecuteNonQuery() > 0;
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ID", bh.MaBaoHanh);
+                    cmd.Parameters.AddWithValue("@NCC", bh.NhaCungCap);
+                    cmd.Parameters.AddWithValue("@NBD", bh.NgayBatDau);
+                    cmd.Parameters.AddWithValue("@NKT", bh.NgayKetThuc);
+                    cmd.Parameters.AddWithValue("@DK", (object)bh.DieuKhoan ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@MTS", (object?)bh.MaTaiSan ?? DBNull.Value);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
             }
         }
 
-        // 🔹 Xóa
+        // ================== XÓA ==================
         public bool Delete(int id)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            string sql = "DELETE FROM BaoHanh WHERE MaBaoHanh = @id";
+            using (var conn = new SqlConnection(_connStr))
             {
                 conn.Open();
-                var cmd = new SqlCommand("DELETE FROM BaoHanh WHERE MaBaoHanh=@id", conn);
-                cmd.Parameters.AddWithValue("@id", id);
-                return cmd.ExecuteNonQuery() > 0;
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
             }
         }
     }

@@ -18,10 +18,4 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="BUS\" />
-    <Folder Include="Controllers\" />
-    <Folder Include="Model\" />
-  </ItemGroup>
-
 </Project>

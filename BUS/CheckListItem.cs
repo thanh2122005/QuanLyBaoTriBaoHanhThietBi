@@ -39,6 +39,5 @@ namespace BaiMoiiii.BUS
                 throw new ArgumentException("Mã item không hợp lệ.");
             return _dal.Delete(id);
         }
-
     }
 }

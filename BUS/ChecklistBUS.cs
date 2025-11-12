@@ -22,6 +22,7 @@ namespace BaiMoiiii.BUS
                 throw new ArgumentException("Tên checklist không được để trống.");
             return _dal.Add(c);
         }
+
         // Cập nhật checklist
         public bool Update(Checklist c)
         {

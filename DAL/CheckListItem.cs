@@ -33,7 +33,6 @@ namespace BaiMoiiii.DAL
             return list;
         }
 
-
         // ===================== THÊM =====================
         public bool Add(ChecklistItem item)
         {
@@ -58,7 +57,6 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
-
         // ===================== XÓA =====================
         public bool Delete(int id)
         {
@@ -68,6 +66,5 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
-
     }
 }

@@ -11,6 +11,7 @@ namespace BaiMoiiii.BUS
         {
             _dal = new LinhKienDAL(config);
         }
+
         public List<LinhKien> GetAll() => _dal.GetAll();
 
         public LinhKien? GetById(int id) => _dal.GetById(id);
