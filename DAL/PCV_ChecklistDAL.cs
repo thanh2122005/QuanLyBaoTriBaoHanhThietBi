@@ -47,7 +47,7 @@ namespace BaiMoiiii.DAL
         // ===================== TỔNG HỢP CHECKLIST =====================
         public List<(int MaPhieuCV, int TongSo, int HoanThanh, int ChuaHoanThanh, bool DaHoanTat)> GetSummary()
         {
-            var summary = new List<(int, int, int, int, bool)>();
+            var list = new List<(int, int, int, int, bool)>();
             using SqlConnection conn = new(_conn);
             SqlCommand cmd = new(@"
                 SELECT MaPhieuCV,
