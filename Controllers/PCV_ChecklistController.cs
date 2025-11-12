@@ -20,7 +20,9 @@ namespace BaiMoiiii.API.Controllers
         public IActionResult GetAllChecklists()
         {
             var list = _bus.GetAll();
-            return data.Any() ? Ok(data) : NotFound(new { message = "Không tìm thấy checklist nào!" });
+            if (!list.Any())
+                return NotFound(new { message = "Không có dữ liệu checklist nào!" });
+            return Ok(list);
         }
 
         // ===================== GET SUMMARY =====================
