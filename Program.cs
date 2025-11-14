@@ -84,6 +84,7 @@ builder.Services.AddSingleton<TaiKhoanDAL>();
 builder.Services.AddSingleton<LichBaoTriBUS>();
 builder.Services.AddSingleton<LichBaoTriDAL>();
 
+
 // =====================================================
 // 🚀 BUILD APP
 // =====================================================

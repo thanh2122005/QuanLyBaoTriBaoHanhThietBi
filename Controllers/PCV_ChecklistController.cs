@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BaiMoiiii.BUS;
-using BaiMoiiii.MODEL;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace BaiMoiiii.API.Controllers
 {
@@ -8,29 +8,56 @@ namespace BaiMoiiii.API.Controllers
     [ApiController]
     public class PCV_ChecklistController : ControllerBase
     {
-        private readonly PCV_ChecklistBUS _bus;
+        private readonly IConfiguration _config;
 
-        public PCV_ChecklistController(PCV_ChecklistBUS bus)
+        public PCV_ChecklistController(IConfiguration config)
         {
-            _bus = bus;
+            _config = config;
         }
 
-        // ===================== GET ALL =====================
-        [HttpGet("get-all")]
-        public IActionResult GetAll()
+        // 🟢 API: Lấy tiến độ theo trạng thái Phiếu công việc
+        [HttpGet("get-progress/{maPCV}")]
+        public IActionResult GetProgress(int maPCV)
         {
-            var list = _bus.GetAll();
-            if (!list.Any())
-                return NotFound(new { message = "Không có dữ liệu checklist nào!" });
-            return Ok(list);
-        }
+            string connectionString = _config.GetConnectionString("DefaultConnection");
 
-        // ===================== GET SUMMARY =====================
-        [HttpGet("summary")]
-        public IActionResult GetSummary()
-        {
-            var result = _bus.GetSummary();
-            return Ok(result);
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string sql = @"
+                    SELECT MaPhieuCV, TrangThai
+                    FROM PhieuCongViec
+                    WHERE MaPhieuCV = @maPCV";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@maPCV", maPCV);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string trangThai = reader["TrangThai"].ToString() ?? "";
+
+                            double tiendo = 0;
+                            if (trangThai == "Mới") tiendo = 0;
+                            else if (trangThai == "Đang xử lý") tiendo = 50;
+                            else if (trangThai == "Hoàn thành") tiendo = 100;
+
+                            return Ok(new
+                            {
+                                MaPhieuCV = maPCV,
+                                TrangThai = trangThai,
+                                TienDo = tiendo
+                            });
+                        }
+                        else
+                        {
+                            return NotFound(new { message = $"Không tìm thấy phiếu công việc có mã {maPCV}" });
+                        }
+                    }
+                }
+            }
         }
     }
 }
