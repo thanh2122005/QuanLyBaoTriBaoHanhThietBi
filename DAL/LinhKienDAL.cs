@@ -9,11 +9,10 @@ namespace BaiMoiiii.DAL
     {
         private readonly string _conn;
 
-        public LinhKienDAL(IConfiguration config)
+        public LinhKienDAL(string connectionString)
         {
-            _conn = config.GetConnectionString("DefaultConnection");
+            _conn = connectionString;
         }
-
         // ==================== GET ALL ====================
         public List<LinhKien> GetAll()
         {

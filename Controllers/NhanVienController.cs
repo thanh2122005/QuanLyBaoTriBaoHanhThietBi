@@ -9,10 +9,16 @@ namespace BaiMoiiii.API.Controllers
     public class NhanVienController : ControllerBase
     {
         private readonly NhanVienBUS _bus;
+        private readonly LogHelper _logger;
+        private readonly string _username;
 
-        public NhanVienController(NhanVienBUS bus)
+        public NhanVienController(NhanVienBUS bus, LogHelper logger)
         {
             _bus = bus;
+            _logger = logger;
+
+            // sau này thay bằng JWT user
+            _username = "Admin";
         }
 
         // ===================== GET ALL =====================
@@ -33,6 +39,7 @@ namespace BaiMoiiii.API.Controllers
             var nv = _bus.GetById(id);
             if (nv == null)
                 return NotFound(new { message = $"Không tìm thấy nhân viên có ID = {id}" });
+
             return Ok(nv);
         }
 
@@ -43,7 +50,11 @@ namespace BaiMoiiii.API.Controllers
             try
             {
                 if (_bus.Add(model))
+                {
+                    _logger.WriteLog("NhanVien", model.MaNV, "Thêm", null, model, _username);
                     return Ok(new { message = "Thêm nhân viên thành công!" });
+                }
+
                 return BadRequest(new { message = "Thêm thất bại!" });
             }
             catch (Exception ex)
@@ -58,10 +69,19 @@ namespace BaiMoiiii.API.Controllers
         {
             try
             {
+                var oldData = _bus.GetById(id);
+                if (oldData == null)
+                    return NotFound(new { message = "Không tìm thấy nhân viên cần cập nhật." });
+
                 model.MaNV = id;
+
                 if (_bus.Update(model))
+                {
+                    _logger.WriteLog("NhanVien", id, "Sửa", oldData, model, _username);
                     return Ok(new { message = "Cập nhật nhân viên thành công!" });
-                return NotFound(new { message = "Không tìm thấy nhân viên cần cập nhật." });
+                }
+
+                return BadRequest(new { message = "Cập nhật thất bại!" });
             }
             catch (Exception ex)
             {
@@ -75,9 +95,17 @@ namespace BaiMoiiii.API.Controllers
         {
             try
             {
+                var oldData = _bus.GetById(id);
+                if (oldData == null)
+                    return NotFound(new { message = "Không tìm thấy nhân viên để xóa." });
+
                 if (_bus.Delete(id))
+                {
+                    _logger.WriteLog("NhanVien", id, "Xóa", oldData, null, _username);
                     return Ok(new { message = "Xóa nhân viên thành công!" });
-                return NotFound(new { message = "Không tìm thấy nhân viên để xóa." });
+                }
+
+                return BadRequest(new { message = "Xóa thất bại!" });
             }
             catch (Exception ex)
             {
@@ -101,4 +129,3 @@ namespace BaiMoiiii.API.Controllers
         }
     }
 }
-    

@@ -7,9 +7,10 @@ namespace BaiMoiiii.BUS
     {
         private readonly PCV_ChecklistDAL _dal;
 
-        public PCV_ChecklistBUS(IConfiguration config)
+        // Nhận DAL qua DI
+        public PCV_ChecklistBUS(PCV_ChecklistDAL dal)
         {
-            _dal = new PCV_ChecklistDAL(config);
+            _dal = dal;
         }
 
         public List<PCV_Checklist> GetAll() => _dal.GetAll();
@@ -20,7 +21,7 @@ namespace BaiMoiiii.BUS
 
             int tongPhieu = data.Count;
             int daHoanTat = data.Count(x => x.DaHoanTat);
-            int chuaHoanTat = data.Count(x => !x.DaHoanTat);
+            int chuaHoanTat = tongPhieu - daHoanTat;
 
             var chiTiet = data.Select(x => new
             {

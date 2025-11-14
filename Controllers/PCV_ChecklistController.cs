@@ -15,7 +15,7 @@ namespace BaiMoiiii.API.Controllers
             _config = config;
         }
 
-        // 🟢 API: Lấy tiến độ theo trạng thái Phiếu công việc
+        // 🟢 API: Tiến độ của 1 phiếu công việc
         [HttpGet("get-progress/{maPCV}")]
         public IActionResult GetProgress(int maPCV)
         {
@@ -35,29 +35,78 @@ namespace BaiMoiiii.API.Controllers
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
-                        {
-                            string trangThai = reader["TrangThai"].ToString() ?? "";
+                        if (!reader.Read())
+                            return NotFound(new { message = $"Không tìm thấy PCV có mã {maPCV}" });
 
-                            double tiendo = 0;
-                            if (trangThai == "Mới") tiendo = 0;
-                            else if (trangThai == "Đang xử lý") tiendo = 50;
-                            else if (trangThai == "Hoàn thành") tiendo = 100;
+                        string trangThai = reader["TrangThai"].ToString() ?? "";
+                        double tiendo = CalcProgress(trangThai);
 
-                            return Ok(new
-                            {
-                                MaPhieuCV = maPCV,
-                                TrangThai = trangThai,
-                                TienDo = tiendo
-                            });
-                        }
-                        else
+                        return Ok(new
                         {
-                            return NotFound(new { message = $"Không tìm thấy phiếu công việc có mã {maPCV}" });
-                        }
+                            MaPhieuCV = maPCV,
+                            TrangThai = trangThai,
+                            TienDo = tiendo
+                        });
                     }
                 }
             }
+        }
+
+
+        // 🟢 API: Lấy tiến độ TẤT CẢ phiếu công việc
+        [HttpGet("get-all-progress")]
+        public IActionResult GetAllProgress()
+        {
+            string connStr = _config.GetConnectionString("DefaultConnection");
+
+            List<object> result = new();
+
+            using (SqlConnection conn = new(connStr))
+            {
+                conn.Open();
+                string sql = @"
+                    SELECT 
+                        MaPhieuCV, 
+                        TenCongViec, 
+                        NhanVienThucHien AS NhanVien,
+                        TrangThai
+                    FROM PhieuCongViec
+                    ORDER BY MaPhieuCV DESC";
+
+                using (SqlCommand cmd = new(sql, conn))
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        string trangThai = dr["TrangThai"].ToString() ?? "";
+                        double tiendo = CalcProgress(trangThai);
+
+                        result.Add(new
+                        {
+                            MaPhieuCV = Convert.ToInt32(dr["MaPhieuCV"]),
+                            TenCongViec = dr["TenCongViec"]?.ToString(),
+                            NhanVien = dr["NhanVien"]?.ToString(),
+                            TrangThai = trangThai,
+                            TienDo = tiendo
+                        });
+                    }
+                }
+            }
+
+            return Ok(result);
+        }
+
+
+        // 🔧 Hàm tính % tiến độ
+        private double CalcProgress(string trangThai)
+        {
+            return trangThai switch
+            {
+                "Mới" => 0,
+                "Đang xử lý" => 50,
+                "Hoàn thành" => 100,
+                _ => 0
+            };
         }
     }
 }

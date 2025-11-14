@@ -10,11 +10,9 @@ namespace BaiMoiiii.API.Controllers
     {
         private readonly NhatKyHeThongBUS _bus;
 
-        // ✅ Inject IConfiguration để lấy connection string từ appsettings.json
-        public NhatKyHeThongController(IConfiguration config)
+        public NhatKyHeThongController(NhatKyHeThongBUS bus)
         {
-            var connectionString = config.GetConnectionString("DefaultConnection");
-            _bus = new NhatKyHeThongBUS(connectionString);
+            _bus = bus;
         }
 
         // ==================== GET ALL ====================
@@ -26,6 +24,7 @@ namespace BaiMoiiii.API.Controllers
                 var list = _bus.GetAll();
                 if (!list.Any())
                     return NotFound(new { message = "Không có nhật ký nào trong hệ thống!" });
+
                 return Ok(list);
             }
             catch (Exception ex)
@@ -64,9 +63,9 @@ namespace BaiMoiiii.API.Controllers
                     return BadRequest(new { message = "Dữ liệu gửi lên không hợp lệ!" });
 
                 if (_bus.AddLog(model))
-                    return Ok(new { message = "✅ Thêm nhật ký thành công!" });
+                    return Ok(new { message = "Thêm nhật ký thành công!" });
 
-                return BadRequest(new { message = "❌ Không thể thêm nhật ký!" });
+                return BadRequest(new { message = "Không thể thêm nhật ký!" });
             }
             catch (Exception ex)
             {
@@ -80,11 +79,11 @@ namespace BaiMoiiii.API.Controllers
         {
             try
             {
-                // Nhật ký thường không xóa, nhưng nếu cần thì có thể làm qua BUS
-                // Ở đây ví dụ giả định có hàm Delete trong DAL
                 var success = _bus.Delete(id);
+
                 if (success)
-                    return Ok(new { message = "🗑️ Xóa bản ghi nhật ký thành công!" });
+                    return Ok(new { message = "Xóa bản ghi nhật ký thành công!" });
+
                 return NotFound(new { message = "Không tìm thấy nhật ký để xóa!" });
             }
             catch (Exception ex)

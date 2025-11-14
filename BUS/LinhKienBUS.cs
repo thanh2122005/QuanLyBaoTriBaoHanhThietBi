@@ -7,9 +7,10 @@ namespace BaiMoiiii.BUS
     {
         private readonly LinhKienDAL _dal;
 
-        public LinhKienBUS(IConfiguration config)
+        // DI inject DAL vào đây
+        public LinhKienBUS(LinhKienDAL dal)
         {
-            _dal = new LinhKienDAL(config);
+            _dal = dal;
         }
 
         public List<LinhKien> GetAll() => _dal.GetAll();

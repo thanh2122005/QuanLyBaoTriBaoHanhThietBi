@@ -8,15 +8,22 @@ namespace BaiMoiiii.BUS
     {
         private readonly NhatKyHeThongDAL _dal;
 
-        public NhatKyHeThongBUS(string connectionString)
+        // BUS nhận DAL 
+        public NhatKyHeThongBUS(NhatKyHeThongDAL dal)
         {
-            _dal = new NhatKyHeThongDAL(connectionString);
+            _dal = dal;
         }
 
         public List<NhatKyHeThong> GetAll() => _dal.GetAll();
 
-        public bool AddLog(NhatKyHeThong log) => _dal.Insert(log);
+        public bool AddLog(NhatKyHeThong log)
+        {
+            return _dal.Insert(log);
+        }
 
-        public bool Delete(long id) => _dal.Delete(id); // ✅ Thêm hàm Delete
+        public bool Delete(long id)
+        {
+            return _dal.Delete(id);
+        }
     }
 }

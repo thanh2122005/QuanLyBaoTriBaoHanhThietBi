@@ -8,9 +8,9 @@ namespace BaiMoiiii.BUS
     {
         private readonly TaiKhoanDAL _dal;
 
-        public TaiKhoanBUS(IConfiguration config)
+        public TaiKhoanBUS(TaiKhoanDAL dal)
         {
-            _dal = new TaiKhoanDAL(config);
+            _dal = dal;
         }
 
         public List<TaiKhoan> GetAll() => _dal.GetAll();

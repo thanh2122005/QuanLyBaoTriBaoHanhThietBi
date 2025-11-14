@@ -9,10 +9,16 @@ namespace BaiMoiiii.API.Controllers
     public class LinhKienController : ControllerBase
     {
         private readonly LinhKienBUS _bus;
+        private readonly LogHelper _logger;
+        private readonly string _username;
 
-        public LinhKienController(LinhKienBUS bus)
+        public LinhKienController(LinhKienBUS bus, LogHelper logger)
         {
             _bus = bus;
+            _logger = logger;
+
+            // sau này thay bằng User.Identity.Name hoặc JWT
+            _username = "Admin";
         }
 
         // ===================== GET ALL =====================
@@ -42,7 +48,11 @@ namespace BaiMoiiii.API.Controllers
             try
             {
                 if (_bus.Add(model))
+                {
+                    _logger.WriteLog("LinhKien", model.MaLinhKien, "Thêm", null, model, _username);
                     return Ok(new { message = "Thêm linh kiện thành công!" });
+                }
+
                 return BadRequest(new { message = "Thêm thất bại!" });
             }
             catch (Exception ex)
@@ -57,10 +67,19 @@ namespace BaiMoiiii.API.Controllers
         {
             try
             {
+                var oldData = _bus.GetById(id);
+                if (oldData == null)
+                    return NotFound(new { message = "Không tìm thấy linh kiện cần cập nhật." });
+
                 model.MaLinhKien = id;
+
                 if (_bus.Update(model))
+                {
+                    _logger.WriteLog("LinhKien", id, "Sửa", oldData, model, _username);
                     return Ok(new { message = "Cập nhật thành công!" });
-                return NotFound(new { message = "Không tìm thấy linh kiện cần cập nhật." });
+                }
+
+                return BadRequest(new { message = "Cập nhật thất bại!" });
             }
             catch (Exception ex)
             {
@@ -74,9 +93,17 @@ namespace BaiMoiiii.API.Controllers
         {
             try
             {
+                var oldData = _bus.GetById(id);
+                if (oldData == null)
+                    return NotFound(new { message = "Không tìm thấy linh kiện để xóa." });
+
                 if (_bus.Delete(id))
+                {
+                    _logger.WriteLog("LinhKien", id, "Xóa", oldData, null, _username);
                     return Ok(new { message = "Xóa linh kiện thành công!" });
-                return NotFound(new { message = "Không tìm thấy linh kiện để xóa." });
+                }
+
+                return BadRequest(new { message = "Xóa thất bại!" });
             }
             catch (Exception ex)
             {
