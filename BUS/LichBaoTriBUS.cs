@@ -7,9 +7,10 @@ namespace BaiMoiiii.BUS
     {
         private readonly LichBaoTriDAL _dal;
 
-        public LichBaoTriBUS(IConfiguration config)
+        // 🟢 DI tự inject DAL vào
+        public LichBaoTriBUS(LichBaoTriDAL dal)
         {
-            _dal = new LichBaoTriDAL(config);
+            _dal = dal;
         }
 
         public List<LichBaoTri> GetAll() => _dal.GetAll();
