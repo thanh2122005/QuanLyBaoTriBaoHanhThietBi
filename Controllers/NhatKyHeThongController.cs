@@ -15,35 +15,57 @@ namespace BaiMoiiii.API.Controllers
             _bus = bus;
         }
 
-        // ===================== GET ALL =====================
+        // ==================== GET ALL ====================
         [HttpGet("get-all")]
         public IActionResult GetAll()
         {
-            var list = _bus.GetAll();
-            if (!list.Any())
-                return NotFound(new { message = "Không có bản ghi nào trong nhật ký hệ thống!" });
-            return Ok(list);
+            try
+            {
+                var list = _bus.GetAll();
+                if (!list.Any())
+                    return NotFound(new { message = "Không có nhật ký nào trong hệ thống!" });
+
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
-        // ===================== GET BY ID =====================
+        // ==================== GET BY ID ====================
         [HttpGet("get/{id}")]
         public IActionResult GetById(long id)
         {
-            var log = _bus.GetById(id);
-            if (log == null)
-                return NotFound(new { message = $"Không tìm thấy log có ID = {id}" });
-            return Ok(log);
+            try
+            {
+                var list = _bus.GetAll();
+                var item = list.FirstOrDefault(x => x.MaLog == id);
+
+                if (item == null)
+                    return NotFound(new { message = "Không tìm thấy bản ghi nhật ký!" });
+
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
-        // ===================== CREATE =====================
+        // ==================== CREATE ====================
         [HttpPost("create")]
         public IActionResult Create([FromBody] NhatKyHeThong model)
         {
             try
             {
-                if (_bus.Add(model))
-                    return Ok(new { message = "Thêm log hệ thống thành công!" });
-                return BadRequest(new { message = "Thêm thất bại!" });
+                if (model == null)
+                    return BadRequest(new { message = "Dữ liệu gửi lên không hợp lệ!" });
+
+                if (_bus.AddLog(model))
+                    return Ok(new { message = "Thêm nhật ký thành công!" });
+
+                return BadRequest(new { message = "Không thể thêm nhật ký!" });
             }
             catch (Exception ex)
             {
@@ -51,32 +73,18 @@ namespace BaiMoiiii.API.Controllers
             }
         }
 
-        // ===================== UPDATE =====================
-        [HttpPut("update/{id}")]
-        public IActionResult Update(long id, [FromBody] NhatKyHeThong model)
-        {
-            try
-            {
-                model.MaLog = id;
-                if (_bus.Update(model))
-                    return Ok(new { message = "Cập nhật thành công!" });
-                return NotFound(new { message = "Không tìm thấy log cần cập nhật." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-        }
-
-        // ===================== DELETE =====================
+        // ==================== DELETE ====================
         [HttpDelete("delete/{id}")]
         public IActionResult Delete(long id)
         {
             try
             {
-                if (_bus.Delete(id))
-                    return Ok(new { message = "Xóa log hệ thống thành công!" });
-                return NotFound(new { message = "Không tìm thấy log để xóa." });
+                var success = _bus.Delete(id);
+
+                if (success)
+                    return Ok(new { message = "Xóa bản ghi nhật ký thành công!" });
+
+                return NotFound(new { message = "Không tìm thấy nhật ký để xóa!" });
             }
             catch (Exception ex)
             {

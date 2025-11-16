@@ -1,5 +1,6 @@
-﻿using BaiMoiiii.DAL;
+﻿using System.Collections.Generic;
 using BaiMoiiii.MODEL;
+using BaiMoiiii.DAL;
 
 namespace BaiMoiiii.BUS
 {
@@ -7,37 +8,21 @@ namespace BaiMoiiii.BUS
     {
         private readonly NhatKyHeThongDAL _dal;
 
-        public NhatKyHeThongBUS(IConfiguration config)
+        // BUS nhận DAL 
+        public NhatKyHeThongBUS(NhatKyHeThongDAL dal)
         {
-            _dal = new NhatKyHeThongDAL(config);
+            _dal = dal;
         }
 
         public List<NhatKyHeThong> GetAll() => _dal.GetAll();
 
-        public NhatKyHeThong? GetById(long id) => _dal.GetById(id);
-
-        public bool Add(NhatKyHeThong log)
+        public bool AddLog(NhatKyHeThong log)
         {
-            if (string.IsNullOrWhiteSpace(log.TenBang))
-                throw new ArgumentException("Tên bảng không được để trống.");
-            if (string.IsNullOrWhiteSpace(log.HanhDong))
-                throw new ArgumentException("Hành động không được để trống.");
-            if (log.MaBanGhi <= 0)
-                throw new ArgumentException("Mã bản ghi không hợp lệ.");
-            return _dal.Add(log);
-        }
-
-        public bool Update(NhatKyHeThong log)
-        {
-            if (log.MaLog <= 0)
-                throw new ArgumentException("Mã log không hợp lệ.");
-            return _dal.Update(log);
+            return _dal.Insert(log);
         }
 
         public bool Delete(long id)
         {
-            if (id <= 0)
-                throw new ArgumentException("Mã log không hợp lệ.");
             return _dal.Delete(id);
         }
     }
