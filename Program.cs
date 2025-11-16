@@ -7,22 +7,27 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// CORS
+// ========== CORS CHO FRONT-END ==========
+// Cho phép gọi từ 127.0.0.1:5500 (Live Server của VSCode)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("_myCors", policy =>
     {
-        policy.WithOrigins("http://127.0.0.1:5501", "http://localhost:5501")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy.WithOrigins(
+            "http://127.0.0.1:5500",
+            "http://localhost:5500"
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
 
-// Lấy connection string
+
+// ========= Lấy connection string =========
 var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// ========== ĐĂNG KÝ DAL (TRANSIENT — ĐÚNG NHẤT) ==========
+// ========== ĐĂNG KÝ DAL ==========
 builder.Services.AddTransient(_ => new BaoHanhDAL(connStr));
 builder.Services.AddTransient(_ => new KhachHangDAL(connStr));
 builder.Services.AddTransient(_ => new TaiSanDAL(connStr));
@@ -33,11 +38,10 @@ builder.Services.AddTransient(_ => new PhieuKhoDAL(connStr));
 builder.Services.AddTransient(_ => new LichBaoTriDAL(connStr));
 builder.Services.AddTransient(_ => new TaiKhoanDAL(connStr));
 builder.Services.AddTransient<PhieuKho_ChiTietDAL>();
+
 builder.Services.AddSingleton(new NhatKyHeThongDAL(connStr));
 builder.Services.AddSingleton(new LinhKienDAL(connStr));
 builder.Services.AddSingleton(new PCV_ChecklistDAL(connStr));
-
-
 
 builder.Services.AddSingleton<LogHelper>();
 
@@ -57,7 +61,6 @@ builder.Services.AddScoped<LinhKienBUS>();
 builder.Services.AddScoped<PCV_ChecklistBUS>();
 
 
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -70,4 +73,5 @@ app.UseHttpsRedirection();
 app.UseCors("_myCors");
 app.UseAuthorization();
 app.MapControllers();
+
 app.Run();
