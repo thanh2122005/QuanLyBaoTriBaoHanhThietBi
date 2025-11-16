@@ -7,16 +7,18 @@ namespace BaiMoiiii.BUS
     {
         private readonly KhachHangDAL _dal;
 
-        public KhachHangBUS(string connectionString)
+        // 🟢 DI sẽ tự inject DAL vào đây
+        public KhachHangBUS(KhachHangDAL dal)
         {
-            _dal = new KhachHangDAL(connectionString);
+            _dal = dal;
         }
 
         public List<KhachHang> GetAll() => _dal.GetAll();
 
         public KhachHang? GetById(int id)
         {
-            if (id <= 0) throw new ArgumentException("Mã khách hàng không hợp lệ!");
+            if (id <= 0)
+                throw new ArgumentException("Mã khách hàng không hợp lệ!");
             return _dal.GetById(id);
         }
 
@@ -24,6 +26,7 @@ namespace BaiMoiiii.BUS
         {
             if (string.IsNullOrWhiteSpace(kh.TenKH))
                 throw new ArgumentException("Tên khách hàng không được để trống!");
+
             return _dal.Add(kh);
         }
 
@@ -31,6 +34,7 @@ namespace BaiMoiiii.BUS
         {
             if (kh.MaKH <= 0)
                 throw new ArgumentException("Mã khách hàng không hợp lệ!");
+
             return _dal.Update(kh);
         }
 
@@ -38,6 +42,7 @@ namespace BaiMoiiii.BUS
         {
             if (id <= 0)
                 throw new ArgumentException("Mã khách hàng không hợp lệ!");
+
             return _dal.Delete(id);
         }
     }

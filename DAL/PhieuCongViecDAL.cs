@@ -12,6 +12,7 @@ namespace BaiMoiiii.DAL
         public PhieuCongViecDAL(string connectionString)
         {
             _conn = connectionString;
+
         }
 
         // ===================== GET ALL =====================
@@ -33,21 +34,21 @@ namespace BaiMoiiii.DAL
                 list.Add(new PhieuCongViec
                 {
                     MaPhieuCV = Convert.ToInt32(dr["MaPhieuCV"]),
-                    Loai = dr["Loai"].ToString(),
+                    Loai = dr["Loai"]?.ToString() ?? "",
                     MaLich = dr["MaLich"] == DBNull.Value ? null : Convert.ToInt32(dr["MaLich"]),
                     MaTaiSan = Convert.ToInt32(dr["MaTaiSan"]),
-                    TieuDe = dr["TieuDe"].ToString(),
-                    MucUuTien = dr["MucUuTien"].ToString(),
+                    TieuDe = dr["TieuDe"]?.ToString() ?? "",
+                    MucUuTien = dr["MucUuTien"]?.ToString() ?? "",
                     SLA_Gio = dr["SLA_Gio"] == DBNull.Value ? null : Convert.ToInt32(dr["SLA_Gio"]),
-                    MoTa = dr["MoTa"] == DBNull.Value ? null : dr["MoTa"].ToString(),
+                    MoTa = dr["MoTa"] == DBNull.Value ? null : dr["MoTa"]?.ToString(),
                     MaNV_PhanCong = dr["MaNV_PhanCong"] == DBNull.Value ? null : Convert.ToInt32(dr["MaNV_PhanCong"]),
                     NgayTao = Convert.ToDateTime(dr["NgayTao"]),
-                    TrangThai = dr["TrangThai"].ToString(),
+                    TrangThai = dr["TrangThai"]?.ToString() ?? "",
                     NgayBatDau = dr["NgayBatDau"] == DBNull.Value ? null : Convert.ToDateTime(dr["NgayBatDau"]),
                     NgayHoanThanh = dr["NgayHoanThanh"] == DBNull.Value ? null : Convert.ToDateTime(dr["NgayHoanThanh"]),
-                    GhiChu = dr["GhiChu"] == DBNull.Value ? null : dr["GhiChu"].ToString(),
-                    TenTaiSan = dr["TenTaiSan"] == DBNull.Value ? null : dr["TenTaiSan"].ToString(),
-                    TenNhanVien = dr["TenNhanVien"] == DBNull.Value ? null : dr["TenNhanVien"].ToString()
+                    GhiChu = dr["GhiChu"] == DBNull.Value ? null : dr["GhiChu"]?.ToString(),
+                    TenTaiSan = dr["TenTaiSan"] == DBNull.Value ? null : dr["TenTaiSan"]?.ToString(),
+                    TenNhanVien = dr["TenNhanVien"] == DBNull.Value ? null : dr["TenNhanVien"]?.ToString()
                 });
             }
             return list;
@@ -63,6 +64,7 @@ namespace BaiMoiiii.DAL
                 LEFT JOIN TaiSan t ON p.MaTaiSan = t.MaTaiSan
                 LEFT JOIN NhanVien nv ON p.MaNV_PhanCong = nv.MaNV
                 WHERE p.MaPhieuCV = @id", conn);
+
             cmd.Parameters.AddWithValue("@id", id);
 
             conn.Open();
@@ -72,23 +74,24 @@ namespace BaiMoiiii.DAL
                 return new PhieuCongViec
                 {
                     MaPhieuCV = Convert.ToInt32(dr["MaPhieuCV"]),
-                    Loai = dr["Loai"].ToString(),
+                    Loai = dr["Loai"]?.ToString() ?? "",
                     MaLich = dr["MaLich"] == DBNull.Value ? null : Convert.ToInt32(dr["MaLich"]),
                     MaTaiSan = Convert.ToInt32(dr["MaTaiSan"]),
-                    TieuDe = dr["TieuDe"].ToString(),
-                    MucUuTien = dr["MucUuTien"].ToString(),
+                    TieuDe = dr["TieuDe"]?.ToString() ?? "",
+                    MucUuTien = dr["MucUuTien"]?.ToString() ?? "",
                     SLA_Gio = dr["SLA_Gio"] == DBNull.Value ? null : Convert.ToInt32(dr["SLA_Gio"]),
-                    MoTa = dr["MoTa"] == DBNull.Value ? null : dr["MoTa"].ToString(),
+                    MoTa = dr["MoTa"] == DBNull.Value ? null : dr["MoTa"]?.ToString(),
                     MaNV_PhanCong = dr["MaNV_PhanCong"] == DBNull.Value ? null : Convert.ToInt32(dr["MaNV_PhanCong"]),
                     NgayTao = Convert.ToDateTime(dr["NgayTao"]),
-                    TrangThai = dr["TrangThai"].ToString(),
+                    TrangThai = dr["TrangThai"]?.ToString() ?? "",
                     NgayBatDau = dr["NgayBatDau"] == DBNull.Value ? null : Convert.ToDateTime(dr["NgayBatDau"]),
                     NgayHoanThanh = dr["NgayHoanThanh"] == DBNull.Value ? null : Convert.ToDateTime(dr["NgayHoanThanh"]),
-                    GhiChu = dr["GhiChu"] == DBNull.Value ? null : dr["GhiChu"].ToString(),
-                    TenTaiSan = dr["TenTaiSan"] == DBNull.Value ? null : dr["TenTaiSan"].ToString(),
-                    TenNhanVien = dr["TenNhanVien"] == DBNull.Value ? null : dr["TenNhanVien"].ToString()
+                    GhiChu = dr["GhiChu"] == DBNull.Value ? null : dr["GhiChu"]?.ToString(),
+                    TenTaiSan = dr["TenTaiSan"] == DBNull.Value ? null : dr["TenTaiSan"]?.ToString(),
+                    TenNhanVien = dr["TenNhanVien"] == DBNull.Value ? null : dr["TenNhanVien"]?.ToString()
                 };
             }
+
             return null;
         }
 

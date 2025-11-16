@@ -10,10 +10,16 @@ namespace BaiMoiiii.API.Controllers
     public class PhieuCongViecController : ControllerBase
     {
         private readonly PhieuCongViecBUS _bus;
+        private readonly LogHelper _logger;
+        private readonly string _username;
 
-        public PhieuCongViecController(PhieuCongViecBUS bus)
+        public PhieuCongViecController(PhieuCongViecBUS bus, LogHelper logger)
         {
             _bus = bus;
+            _logger = logger;
+
+            // sau này thay bằng JWT
+            _username = "Admin";
         }
 
         // ===================== GET ALL =====================
@@ -35,6 +41,7 @@ namespace BaiMoiiii.API.Controllers
             var obj = _bus.GetById(id);
             if (obj == null)
                 return NotFound(new { message = $"Không tìm thấy phiếu công việc có ID = {id}" });
+
             return Ok(new { message = "Tải thành công!", data = obj });
         }
 
@@ -49,7 +56,11 @@ namespace BaiMoiiii.API.Controllers
             {
                 bool result = _bus.Add(model);
                 if (result)
+                {
+                    _logger.WriteLog("PhieuCongViec", model.MaPhieuCV, "Thêm", null, model, _username);
                     return Ok(new { message = "Thêm phiếu công việc thành công!" });
+                }
+
                 return BadRequest(new { message = "Không thể thêm phiếu công việc!" });
             }
             catch (Exception ex)
@@ -67,10 +78,19 @@ namespace BaiMoiiii.API.Controllers
 
             try
             {
+                var oldData = _bus.GetById(id);
+                if (oldData == null)
+                    return NotFound(new { message = $"Không tìm thấy phiếu công việc có ID = {id}" });
+
                 model.MaPhieuCV = id;
+
                 bool result = _bus.Update(model);
                 if (result)
+                {
+                    _logger.WriteLog("PhieuCongViec", id, "Sửa", oldData, model, _username);
                     return Ok(new { message = "Cập nhật phiếu công việc thành công!" });
+                }
+
                 return NotFound(new { message = $"Không tìm thấy phiếu công việc có ID = {id}" });
             }
             catch (Exception ex)
@@ -85,9 +105,17 @@ namespace BaiMoiiii.API.Controllers
         {
             try
             {
+                var oldData = _bus.GetById(id);
+                if (oldData == null)
+                    return NotFound(new { message = $"Không tìm thấy phiếu công việc có ID = {id}" });
+
                 bool result = _bus.Delete(id);
                 if (result)
+                {
+                    _logger.WriteLog("PhieuCongViec", id, "Xóa", oldData, null, _username);
                     return Ok(new { message = "Xóa phiếu công việc thành công!" });
+                }
+
                 return NotFound(new { message = $"Không tìm thấy phiếu công việc có ID = {id}" });
             }
             catch (Exception ex)

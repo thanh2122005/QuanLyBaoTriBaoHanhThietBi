@@ -9,11 +9,10 @@ namespace BaiMoiiii.DAL
     {
         private readonly string _conn;
 
-        public LichBaoTriDAL(IConfiguration config)
+        public LichBaoTriDAL(string connectionString)
         {
-            _conn = config.GetConnectionString("DefaultConnection");
+            _conn = connectionString;
         }
-
         // ==================== GET ALL ====================
         public List<LichBaoTri> GetAll()
         {
@@ -122,5 +121,6 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
+
     }
 }

@@ -3,7 +3,6 @@ using BaiMoiiii.MODEL;
 using BaiMoiiii.DAL;
 using Microsoft.Extensions.Configuration;
 
-
 namespace BaiMoiiii.BUS
 {
     public class LogHelper
