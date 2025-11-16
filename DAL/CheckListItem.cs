@@ -28,6 +28,7 @@ namespace BaiMoiiii.DAL
                     ItemID = Convert.ToInt32(dr["ItemID"]),
                     ChecklistID = Convert.ToInt32(dr["ChecklistID"]),
                     NoiDung = dr["NoiDung"].ToString() ?? ""
+
                 });
             }
             return list;

@@ -4,16 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =====================================================
-// 🧩 DỊCH VỤ CƠ BẢN
-// =====================================================
+// DỊCH VỤ CƠ BẢN
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// =====================================================
-// 🌐 CẤU HÌNH CORS CHO FRONT-END (HTML, JS)
-// =====================================================
+// CẤU HÌNH CORS CHO FRONT-END (HTML, JS)
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddCors(options =>
@@ -30,14 +26,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-// =====================================================
-// 🔗 KẾT NỐI CHUỖI CSDL
-// =====================================================
+// KẾT NỐI CHUỖI CSDL
 var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// =====================================================
-// 🧱 ĐĂNG KÝ DAL & BUS (ADO.NET)
-// =====================================================
+// ĐĂNG KÝ DAL & BUS (ADO.NET)
 
 // ♦ BẢO HÀNH
 builder.Services.AddSingleton(new BaoHanhDAL(connStr));
@@ -63,16 +55,16 @@ builder.Services.AddScoped<PhieuSuCoBUS>(_ => new PhieuSuCoBUS(connStr));
 builder.Services.AddSingleton(new PhieuCongViecDAL(connStr));
 builder.Services.AddScoped<PhieuCongViecBUS>(_ => new PhieuCongViecBUS(connStr));
 
-// ♦ PHIẾU KHO ✅ (bổ sung mới)
+// ♦ PHIẾU KHO  (bổ sung mới)
 builder.Services.AddSingleton(new PhieuKhoDAL(connStr));
 builder.Services.AddScoped<PhieuKhoBUS>(_ => new PhieuKhoBUS(connStr));
 
-//// ♦ CHI TIẾT PHIẾU KHO ✅
+//// ♦ CHI TIẾT PHIẾU KHO 
 builder.Services.AddSingleton<PhieuKho_ChiTietDAL>();
 builder.Services.AddScoped<PhieuKho_ChiTietBUS>();
 
 
-// ♦ LINH KIỆN ✅
+// ♦ LINH KIỆN 
 builder.Services.AddSingleton<LinhKienDAL>();
 builder.Services.AddScoped<LinhKienBUS>();
 
@@ -84,14 +76,10 @@ builder.Services.AddSingleton<TaiKhoanDAL>();
 builder.Services.AddSingleton<LichBaoTriBUS>();
 builder.Services.AddSingleton<LichBaoTriDAL>();
 
-// =====================================================
-// 🚀 BUILD APP
-// =====================================================
+//BUILD APP
 var app = builder.Build();
 
-// =====================================================
-// 🧩 MIDDLEWARE PIPELINE
-// =====================================================
+//MIDDLEWARE PIPELINE
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

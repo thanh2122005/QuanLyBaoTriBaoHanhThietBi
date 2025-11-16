@@ -47,11 +47,6 @@ namespace BaiMoiiii.API.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/Dung
         [HttpPut("update/{id}")]
         public IActionResult Update(int id, [FromBody] LichBaoTri model)
         {
@@ -82,9 +77,5 @@ namespace BaiMoiiii.API.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/Dung
     }
 }
