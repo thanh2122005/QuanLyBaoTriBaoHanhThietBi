@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BaiMoiiii.BUS;
 using BaiMoiiii.MODEL;
-using Microsoft.IdentityModel.Logging;
-
 
 namespace BaiMoiiii.API.Controllers
 {
