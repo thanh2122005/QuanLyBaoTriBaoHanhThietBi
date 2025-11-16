@@ -8,9 +8,9 @@ namespace BaiMoiiii.BUS
     {
         private readonly TaiKhoanDAL _dal;
 
-        public TaiKhoanBUS(IConfiguration config)
+        public TaiKhoanBUS(TaiKhoanDAL dal)
         {
-            _dal = new TaiKhoanDAL(config);
+            _dal = dal;
         }
 
         public List<TaiKhoan> GetAll() => _dal.GetAll();
@@ -22,5 +22,12 @@ namespace BaiMoiiii.BUS
         public bool Update(TaiKhoan tk) => _dal.Update(tk);
 
         public bool Delete(int id) => _dal.Delete(id);
+
+        public TaiKhoan? GetByEmail(string email)
+{
+    return _dal.GetAll().FirstOrDefault(x => x.Email == email);
+}
+
+
     }
 }

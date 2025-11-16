@@ -1,4 +1,4 @@
-﻿using BaiMoiiii.DAL;
+using BaiMoiiii.DAL;
 using BaiMoiiii.MODEL;
 
 namespace BaiMoiiii.BUS
@@ -7,9 +7,10 @@ namespace BaiMoiiii.BUS
     {
         private readonly NhanVienDAL _dal;
 
-        public NhanVienBUS(string connectionString)
+        // ⭐ GIỮ THEO NHÁNH DŨNG (DÙNG DI ĐÚNG CHUẨN)
+        public NhanVienBUS(NhanVienDAL dal)
         {
-            _dal = new NhanVienDAL(connectionString);
+            _dal = dal;
         }
 
         public List<NhanVien> GetAll() => _dal.GetAll();
@@ -20,6 +21,7 @@ namespace BaiMoiiii.BUS
         {
             if (string.IsNullOrWhiteSpace(nv.HoTen))
                 throw new ArgumentException("Họ tên không được để trống.");
+
             if (string.IsNullOrWhiteSpace(nv.TrangThai))
                 nv.TrangThai = "Hoạt động";
 

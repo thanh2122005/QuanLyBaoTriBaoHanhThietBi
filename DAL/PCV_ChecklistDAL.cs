@@ -9,11 +9,10 @@ namespace BaiMoiiii.DAL
     {
         private readonly string _conn;
 
-        public PCV_ChecklistDAL(IConfiguration config)
+        public PCV_ChecklistDAL(string connectionString)
         {
-            _conn = config.GetConnectionString("DefaultConnection");
+            _conn = connectionString;
         }
-
         // ===================== GET ALL =====================
         public List<PCV_Checklist> GetAll()
         {

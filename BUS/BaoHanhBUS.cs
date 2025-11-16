@@ -8,19 +8,15 @@ namespace BaiMoiiii.BUS
     {
         private readonly BaoHanhDAL _dal;
 
-        public BaoHanhBUS(string connStr)
+        public BaoHanhBUS(BaoHanhDAL dal)   // ⬅ nhận DAL, không nhận string
         {
-            _dal = new BaoHanhDAL(connStr);
+            _dal = dal;
         }
 
         public List<BaoHanh> GetAll() => _dal.GetAll();
-
         public BaoHanh? GetById(int id) => _dal.GetById(id);
-
         public bool Add(BaoHanh bh) => _dal.Insert(bh);
-
         public bool Update(BaoHanh bh) => _dal.Update(bh);
-
         public bool Delete(int id) => _dal.Delete(id);
     }
 }
