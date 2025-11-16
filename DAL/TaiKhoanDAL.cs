@@ -80,6 +80,41 @@ namespace BaiMoiiii.DAL
             }
             return tk;
         }
+        // ===== Lấy theo Email =====
+        public TaiKhoan? GetByEmail(string email)
+        {
+            TaiKhoan? tk = null;
+            string sql = "SELECT * FROM TaiKhoan WHERE Email = @Email";
+
+            using (var conn = new SqlConnection(_conn))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Email", email);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            tk = new TaiKhoan
+                            {
+                                MaTaiKhoan = (int)reader["MaTaiKhoan"],
+                                TenDangNhap = reader["TenDangNhap"].ToString(),
+                                MatKhauHash = reader["MatKhauHash"].ToString(),
+                                Role = reader["Role"].ToString(),
+                                FullName = reader["FullName"]?.ToString(),
+                                Email = reader["Email"]?.ToString(),
+                                Phone = reader["Phone"]?.ToString(),
+                                TrangThai = reader["TrangThai"].ToString(),
+                                NgayTao = (DateTime)reader["NgayTao"]
+                            };
+                        }
+                    }
+                }
+            }
+            return tk;
+        }
+
 
         // ===== Thêm mới =====
         public bool Insert(TaiKhoan tk)

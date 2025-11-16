@@ -82,8 +82,9 @@ namespace BaiMoiiii.API.Controllers
         }
 
         // ===================== DELETE =====================
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public IActionResult Delete(int id)
+
         {
             var oldData = _bus.GetById(id);
             if (oldData == null)

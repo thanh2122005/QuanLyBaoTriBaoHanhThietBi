@@ -22,5 +22,12 @@ namespace BaiMoiiii.BUS
         public bool Update(TaiKhoan tk) => _dal.Update(tk);
 
         public bool Delete(int id) => _dal.Delete(id);
+
+        public TaiKhoan? GetByEmail(string email)
+{
+    return _dal.GetAll().FirstOrDefault(x => x.Email == email);
+}
+
+
     }
 }
