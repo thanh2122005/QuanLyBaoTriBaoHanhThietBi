@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using BaiMoiiii.MODEL;
 
 namespace BaiMoiiii.DAL
@@ -9,6 +9,7 @@ namespace BaiMoiiii.DAL
     {
         private readonly string _connectionString;
 
+        // ⭐ GIỮ ĐÚNG THEO NHÁNH DŨNG
         public NhatKyHeThongDAL(string connectionString)
         {
             _connectionString = connectionString;
@@ -45,7 +46,8 @@ namespace BaiMoiiii.DAL
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = @"INSERT INTO NhatKyHeThong (TenBang, MaBanGhi, HanhDong, GiaTriCu, GiaTriMoi, ThayDoiBoi)
+                string query = @"INSERT INTO NhatKyHeThong 
+                                (TenBang, MaBanGhi, HanhDong, GiaTriCu, GiaTriMoi, ThayDoiBoi)
                                  VALUES (@TenBang, @MaBanGhi, @HanhDong, @GiaTriCu, @GiaTriMoi, @ThayDoiBoi)";
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@TenBang", log.TenBang);

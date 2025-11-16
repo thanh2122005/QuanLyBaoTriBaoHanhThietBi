@@ -57,7 +57,6 @@ namespace BaiMoiiii.DAL
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
-
         // ===================== XÓA =====================
         public bool Delete(int id)
         {

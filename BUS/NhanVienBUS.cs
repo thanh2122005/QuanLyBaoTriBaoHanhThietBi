@@ -1,4 +1,4 @@
-﻿using BaiMoiiii.DAL;
+using BaiMoiiii.DAL;
 using BaiMoiiii.MODEL;
 
 namespace BaiMoiiii.BUS
@@ -7,13 +7,14 @@ namespace BaiMoiiii.BUS
     {
         private readonly NhanVienDAL _dal;
 
-        // BUS nhận DAL qua DI
+        // ⭐ GIỮ THEO NHÁNH DŨNG (DÙNG DI ĐÚNG CHUẨN)
         public NhanVienBUS(NhanVienDAL dal)
         {
             _dal = dal;
         }
 
         public List<NhanVien> GetAll() => _dal.GetAll();
+
         public NhanVien? GetById(int id) => _dal.GetById(id);
 
         public bool Add(NhanVien nv)

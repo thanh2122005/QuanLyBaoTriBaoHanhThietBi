@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient; 
+using Microsoft.Data.SqlClient;
 using BaiMoiiii.MODEL;
 
 namespace BaiMoiiii.DAL
@@ -109,7 +109,6 @@ namespace BaiMoiiii.DAL
             using SqlConnection conn = new(_conn);
             SqlCommand cmd = new("DELETE FROM NhanVien WHERE MaNV = @id", conn);
             cmd.Parameters.AddWithValue("@id", id);
-
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
@@ -119,7 +118,6 @@ namespace BaiMoiiii.DAL
         {
             using SqlConnection conn = new(_conn);
             SqlCommand cmd = new("SELECT COUNT(*) FROM NhanVien WHERE TrangThai = N'Hoạt động'", conn);
-
             conn.Open();
             return (int)cmd.ExecuteScalar();
         }
