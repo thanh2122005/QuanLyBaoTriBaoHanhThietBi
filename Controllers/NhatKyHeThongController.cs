@@ -23,9 +23,31 @@ namespace BaiMoiiii.API.Controllers
             {
                 var list = _bus.GetAll();
                 if (!list.Any())
-                    return NotFound(new { message = "Không có nhật ký nào trong hệ thống!" });
+                    return NotFound(new { message = "Không có nhật ký nào!" });
 
                 return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        // ==================== PAGING ====================
+        [HttpGet("paging")]
+        public IActionResult Paging(int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var data = _bus.GetPaged(page, pageSize);
+                var total = _bus.CountAll();
+
+                return Ok(new
+                {
+                    data,
+                    totalItems = total,
+                    totalPages = (int)Math.Ceiling((double)total / pageSize)
+                });
             }
             catch (Exception ex)
             {
@@ -43,7 +65,7 @@ namespace BaiMoiiii.API.Controllers
                 var item = list.FirstOrDefault(x => x.MaLog == id);
 
                 if (item == null)
-                    return NotFound(new { message = "Không tìm thấy bản ghi nhật ký!" });
+                    return NotFound(new { message = "Không tìm thấy nhật ký!" });
 
                 return Ok(item);
             }
@@ -60,7 +82,7 @@ namespace BaiMoiiii.API.Controllers
             try
             {
                 if (model == null)
-                    return BadRequest(new { message = "Dữ liệu gửi lên không hợp lệ!" });
+                    return BadRequest(new { message = "Dữ liệu không hợp lệ!" });
 
                 if (_bus.AddLog(model))
                     return Ok(new { message = "Thêm nhật ký thành công!" });
@@ -82,7 +104,7 @@ namespace BaiMoiiii.API.Controllers
                 var success = _bus.Delete(id);
 
                 if (success)
-                    return Ok(new { message = "Xóa bản ghi nhật ký thành công!" });
+                    return Ok(new { message = "Xóa nhật ký thành công!" });
 
                 return NotFound(new { message = "Không tìm thấy nhật ký để xóa!" });
             }

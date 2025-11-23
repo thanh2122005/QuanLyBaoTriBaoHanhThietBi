@@ -1,7 +1,14 @@
 ﻿using BaiMoiiii.BUS;
 using BaiMoiiii.DAL;
+using OfficeOpenXml;
+
+
+// ⚠ BẮT BUỘC ĐẶT TRƯỚC builder
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -22,7 +29,7 @@ builder.Services.AddCors(options =>
 // Lấy connection string
 var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// ========== ĐĂNG KÝ DAL (TRANSIENT — ĐÚNG NHẤT) ==========
+// ĐĂNG KÝ DAL
 builder.Services.AddTransient(_ => new BaoHanhDAL(connStr));
 builder.Services.AddTransient(_ => new KhachHangDAL(connStr));
 builder.Services.AddTransient(_ => new TaiSanDAL(connStr));
@@ -33,15 +40,13 @@ builder.Services.AddTransient(_ => new PhieuKhoDAL(connStr));
 builder.Services.AddTransient(_ => new LichBaoTriDAL(connStr));
 builder.Services.AddTransient(_ => new TaiKhoanDAL(connStr));
 builder.Services.AddTransient<PhieuKho_ChiTietDAL>();
+
 builder.Services.AddSingleton(new NhatKyHeThongDAL(connStr));
 builder.Services.AddSingleton(new LinhKienDAL(connStr));
 builder.Services.AddSingleton(new PCV_ChecklistDAL(connStr));
-
-
-
 builder.Services.AddSingleton<LogHelper>();
 
-// ========== ĐĂNG KÝ BUS ==========
+// ĐĂNG KÝ BUS
 builder.Services.AddScoped<BaoHanhBUS>();
 builder.Services.AddScoped<KhachHangBUS>();
 builder.Services.AddScoped<TaiSanBUS>();
@@ -56,8 +61,6 @@ builder.Services.AddScoped<NhatKyHeThongBUS>();
 builder.Services.AddScoped<LinhKienBUS>();
 builder.Services.AddScoped<PCV_ChecklistBUS>();
 
-
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -70,4 +73,5 @@ app.UseHttpsRedirection();
 app.UseCors("_myCors");
 app.UseAuthorization();
 app.MapControllers();
+
 app.Run();

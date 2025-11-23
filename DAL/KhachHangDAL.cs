@@ -12,13 +12,14 @@ namespace BaiMoiiii.DAL
             _connectionString = connectionString;
         }
 
-        // 🔹 Lấy tất cả khách hàng
+        // ========== GET ALL ==========
         public List<KhachHang> GetAll()
         {
             var list = new List<KhachHang>();
             using var conn = new SqlConnection(_connectionString);
-            var cmd = new SqlCommand("SELECT * FROM KhachHang ORDER BY MaKH DESC", conn);
+            var cmd = new SqlCommand("SELECT * FROM KhachHang ORDER BY MaKH ASC", conn);
             conn.Open();
+
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -26,52 +27,55 @@ namespace BaiMoiiii.DAL
                 {
                     MaKH = Convert.ToInt32(reader["MaKH"]),
                     TenKH = reader["TenKH"].ToString() ?? "",
-                    DiaChi = reader["DiaChi"] == DBNull.Value ? null : reader["DiaChi"].ToString(),
-                    DienThoai = reader["DienThoai"] == DBNull.Value ? null : reader["DienThoai"].ToString(),
-                    Email = reader["Email"] == DBNull.Value ? null : reader["Email"].ToString()
+                    DiaChi = reader["DiaChi"]?.ToString(),
+                    DienThoai = reader["DienThoai"]?.ToString(),
+                    Email = reader["Email"]?.ToString()
                 });
             }
             return list;
         }
 
-        // 🔹 Lấy theo ID
+        // ========== GET BY ID ==========
         public KhachHang? GetById(int id)
         {
             using var conn = new SqlConnection(_connectionString);
             var cmd = new SqlCommand("SELECT * FROM KhachHang WHERE MaKH=@id", conn);
+
             cmd.Parameters.AddWithValue("@id", id);
+
             conn.Open();
             using var reader = cmd.ExecuteReader();
-            if (reader.Read())
+
+            if (!reader.Read()) return null;
+
+            return new KhachHang
             {
-                return new KhachHang
-                {
-                    MaKH = Convert.ToInt32(reader["MaKH"]),
-                    TenKH = reader["TenKH"].ToString() ?? "",
-                    DiaChi = reader["DiaChi"] == DBNull.Value ? null : reader["DiaChi"].ToString(),
-                    DienThoai = reader["DienThoai"] == DBNull.Value ? null : reader["DienThoai"].ToString(),
-                    Email = reader["Email"] == DBNull.Value ? null : reader["Email"].ToString()
-                };
-            }
-            return null;
+                MaKH = Convert.ToInt32(reader["MaKH"]),
+                TenKH = reader["TenKH"].ToString() ?? "",
+                DiaChi = reader["DiaChi"]?.ToString(),
+                DienThoai = reader["DienThoai"]?.ToString(),
+                Email = reader["Email"]?.ToString()
+            };
         }
 
-        // 🔹 Thêm mới
+        // ========== ADD ==========
         public bool Add(KhachHang kh)
         {
             using var conn = new SqlConnection(_connectionString);
             var cmd = new SqlCommand(@"
                 INSERT INTO KhachHang (TenKH, DiaChi, DienThoai, Email)
                 VALUES (@TenKH, @DiaChi, @DienThoai, @Email)", conn);
+
             cmd.Parameters.AddWithValue("@TenKH", kh.TenKH);
             cmd.Parameters.AddWithValue("@DiaChi", (object?)kh.DiaChi ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@DienThoai", (object?)kh.DienThoai ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@Email", (object?)kh.Email ?? DBNull.Value);
+
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
 
-        // 🔹 Cập nhật
+        // ========== UPDATE ==========
         public bool Update(KhachHang kh)
         {
             using var conn = new SqlConnection(_connectionString);
@@ -79,23 +83,69 @@ namespace BaiMoiiii.DAL
                 UPDATE KhachHang
                 SET TenKH=@TenKH, DiaChi=@DiaChi, DienThoai=@DienThoai, Email=@Email
                 WHERE MaKH=@MaKH", conn);
+
             cmd.Parameters.AddWithValue("@MaKH", kh.MaKH);
             cmd.Parameters.AddWithValue("@TenKH", kh.TenKH);
             cmd.Parameters.AddWithValue("@DiaChi", (object?)kh.DiaChi ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@DienThoai", (object?)kh.DienThoai ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@Email", (object?)kh.Email ?? DBNull.Value);
+
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
         }
 
-        // 🔹 Xóa
+        // ========== DELETE ==========
         public bool Delete(int id)
         {
             using var conn = new SqlConnection(_connectionString);
             var cmd = new SqlCommand("DELETE FROM KhachHang WHERE MaKH=@id", conn);
             cmd.Parameters.AddWithValue("@id", id);
+
             conn.Open();
             return cmd.ExecuteNonQuery() > 0;
+        }
+
+        // ========== PAGING ==========
+        public List<KhachHang> GetPaged(int page, int size)
+        {
+            var list = new List<KhachHang>();
+
+            using var conn = new SqlConnection(_connectionString);
+            var cmd = new SqlCommand(@"
+        SELECT *
+        FROM KhachHang
+        ORDER BY MaKH ASC
+        OFFSET (@skip) ROWS
+        FETCH NEXT @size ROWS ONLY;", conn);
+
+            cmd.Parameters.AddWithValue("@skip", (page - 1) * size);
+            cmd.Parameters.AddWithValue("@size", size);
+
+            conn.Open();
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                list.Add(new KhachHang
+                {
+                    MaKH = Convert.ToInt32(reader["MaKH"]),
+                    TenKH = reader["TenKH"].ToString() ?? "",
+                    DiaChi = reader["DiaChi"]?.ToString(),
+                    DienThoai = reader["DienThoai"]?.ToString(),
+                    Email = reader["Email"]?.ToString()
+                });
+            }
+
+            return list;
+        }
+
+        // ========== COUNT ==========
+        public int CountAll()
+        {
+            using var conn = new SqlConnection(_connectionString);
+            var cmd = new SqlCommand("SELECT COUNT(*) FROM KhachHang", conn);
+            conn.Open();
+            return (int)cmd.ExecuteScalar();
         }
     }
 }

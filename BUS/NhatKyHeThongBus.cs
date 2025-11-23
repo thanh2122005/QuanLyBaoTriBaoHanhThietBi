@@ -25,5 +25,15 @@ namespace BaiMoiiii.BUS
         {
             return _dal.Delete(id);
         }
+        public List<NhatKyHeThong> GetPaged(int page, int size)
+        {
+            return _dal.GetPaged(page, size);
+        }
+
+        public int CountAll()
+        {
+            return _dal.CountAll();
+        }
+
     }
 }

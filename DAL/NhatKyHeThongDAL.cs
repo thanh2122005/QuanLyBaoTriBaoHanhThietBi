@@ -9,12 +9,12 @@ namespace BaiMoiiii.DAL
     {
         private readonly string _connectionString;
 
-        // ⭐ GIỮ ĐÚNG THEO NHÁNH DŨNG
         public NhatKyHeThongDAL(string connectionString)
         {
             _connectionString = connectionString;
         }
 
+        // ======================= GET ALL =======================
         public List<NhatKyHeThong> GetAll()
         {
             var list = new List<NhatKyHeThong>();
@@ -26,22 +26,13 @@ namespace BaiMoiiii.DAL
                 SqlDataReader dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
-                    list.Add(new NhatKyHeThong
-                    {
-                        MaLog = (long)dr["MaLog"],
-                        TenBang = dr["TenBang"].ToString(),
-                        MaBanGhi = Convert.ToInt32(dr["MaBanGhi"]),
-                        HanhDong = dr["HanhDong"].ToString(),
-                        GiaTriCu = dr["GiaTriCu"]?.ToString(),
-                        GiaTriMoi = dr["GiaTriMoi"]?.ToString(),
-                        ThayDoiBoi = dr["ThayDoiBoi"]?.ToString(),
-                        ThoiGian = Convert.ToDateTime(dr["ThoiGian"])
-                    });
+                    list.Add(MapToNK(dr));
                 }
             }
             return list;
         }
 
+        // ======================= INSERT =======================
         public bool Insert(NhatKyHeThong log)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -62,6 +53,7 @@ namespace BaiMoiiii.DAL
             }
         }
 
+        // ======================= DELETE =======================
         public bool Delete(long id)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -72,6 +64,65 @@ namespace BaiMoiiii.DAL
                 conn.Open();
                 return cmd.ExecuteNonQuery() > 0;
             }
+        }
+
+        // ======================= PAGED =======================
+        public List<NhatKyHeThong> GetPaged(int page, int size)
+        {
+            var list = new List<NhatKyHeThong>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    SELECT *
+                    FROM NhatKyHeThong
+                    ORDER BY ThoiGian DESC
+                    OFFSET (@skip) ROWS
+                    FETCH NEXT @size ROWS ONLY;
+                ";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@skip", (page - 1) * size);
+                cmd.Parameters.AddWithValue("@size", size);
+
+                conn.Open();
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    list.Add(MapToNK(dr));
+                }
+            }
+
+            return list;
+        }
+
+        // ======================= COUNT =======================
+        public int CountAll()
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT COUNT(*) FROM NhatKyHeThong";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                conn.Open();
+                return (int)cmd.ExecuteScalar();
+            }
+        }
+
+        // ======================= MAP FUNCTION =======================
+        private static NhatKyHeThong MapToNK(SqlDataReader dr)
+        {
+            return new NhatKyHeThong
+            {
+                MaLog = (long)dr["MaLog"],
+                TenBang = dr["TenBang"].ToString(),
+                MaBanGhi = Convert.ToInt32(dr["MaBanGhi"]),
+                HanhDong = dr["HanhDong"].ToString(),
+                GiaTriCu = dr["GiaTriCu"]?.ToString(),
+                GiaTriMoi = dr["GiaTriMoi"]?.ToString(),
+                ThayDoiBoi = dr["ThayDoiBoi"]?.ToString(),
+                ThoiGian = Convert.ToDateTime(dr["ThoiGian"])
+            };
         }
     }
 }

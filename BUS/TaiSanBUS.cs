@@ -54,5 +54,11 @@ namespace BaiMoiiii.BUS
 
             return _dal.Delete(id);
         }
+        public List<TaiSan> GetPaged(int page, int size)
+    => _dal.GetPaged(page, size);
+
+        public int CountAll()
+            => _dal.CountAll();
+
     }
 }
