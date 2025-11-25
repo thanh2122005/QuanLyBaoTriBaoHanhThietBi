@@ -24,7 +24,7 @@ namespace BaiMoiiii.DAL
                 SELECT pk.*, nv.HoTen 
                 FROM PhieuKho pk
                 LEFT JOIN NhanVien nv ON pk.MaNV = nv.MaNV
-                ORDER BY pk.MaPhieuKho DESC";
+                ORDER BY pk.MaPhieuKho ASC";
 
             using (var conn = new SqlConnection(_connStr))
             {

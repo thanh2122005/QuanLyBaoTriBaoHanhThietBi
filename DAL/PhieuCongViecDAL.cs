@@ -25,7 +25,7 @@ namespace BaiMoiiii.DAL
                 FROM PhieuCongViec p
                 LEFT JOIN TaiSan t ON p.MaTaiSan = t.MaTaiSan
                 LEFT JOIN NhanVien nv ON p.MaNV_PhanCong = nv.MaNV
-                ORDER BY p.NgayTao DESC", conn);
+                ORDER BY p.NgayTao ASC", conn);
 
             conn.Open();
             using SqlDataReader dr = cmd.ExecuteReader();

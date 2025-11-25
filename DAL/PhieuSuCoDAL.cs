@@ -22,7 +22,7 @@ namespace BaiMoiiii.DAL
                 SELECT p.*, t.TenTaiSan 
                 FROM PhieuSuCo p
                 LEFT JOIN TaiSan t ON p.MaTaiSan = t.MaTaiSan
-                ORDER BY p.MaSuCo DESC";
+                ORDER BY p.MaSuCo ASC";
 
             using (var conn = new SqlConnection(_connStr))
             {
