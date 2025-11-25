@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi" ng-app="AppQuanLyBaoTri">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quản lý Sự cố - Hệ thống Bảo trì</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- AngularJS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <style>
+    .nav-link { display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-radius:.5rem;
+      color:#1f2937;font-weight:500;transition:.2s }
+    .nav-link:hover { background:#f1f5f9 }
+    .nav-link.active { background:#e6f0ff;color:#1d4ed8;box-shadow:inset 2px 0 0 #3b82f6 }
+    .modal { display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
+      align-items:center;justify-content:center;z-index:50 }
+    .modal.show { display:flex; }
+    .modal-content { background:#fff;border-radius:.75rem;padding:1.5rem;
+      width:90%;max-width:680px;max-height:90vh;overflow:auto }
+  </style>
+</head>
+
+<body class="bg-gray-50" ng-controller="SuCoCtrl">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <div class="p-4 border-b border-gray-200">
+        <h1 class="text-xl font-bold text-blue-600">Hệ thống Bảo trì</h1>
+      </div>
+      <nav class="flex-1 overflow-y-auto p-4 space-y-1">
+        <a href="dashboard.html" class="nav-link">📊 Tổng quan</a>
+        <a href="assets.html" class="nav-link">🏢 Tài sản</a>
+        <a href="customers.html" class="nav-link">👥 Khách hàng</a>
+        <a href="warranties.html" class="nav-link">🛡️ Bảo hành</a>
+        <a href="work-orders.html" class="nav-link">📋 Phiếu công việc</a>
+        <a href="schedules.html" class="nav-link">📅 Lịch bảo trì</a>
+        <a href="incidents.html" class="nav-link active">⚠️ Sự cố</a>
+        <a href="inventory.html" class="nav-link">🔧 Kho linh kiện</a>
+        <a href="warehouse.html" class="nav-link">📦 Phiếu kho</a>
+        <a href="employees.html" class="nav-link">👨‍💼 Nhân viên</a>
+                <a href="roles.html" class="nav-link">🔐 Tài Khoản</a>
+        <a href="checklists.html" class="nav-link">✅ Checklist</a>
+         <a href="logs.html" class="nav-link ">🧾 Nhật ký hệ thống</a>
+
+      </nav>
+       <!-- 🔴 Nút Đăng xuất -->
+      <div class="p-4 border-t border-gray-200">
+        <button id="logoutBtn"
+          class="w-full py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded transition">
+          Đăng xuất
+        </button>
+      </div>
+    
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold">Quản lý Sự cố</h2>
+          <button ng-click="openModal()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            + Báo cáo sự cố
+          </button>
+        </div>
+
+        <!-- Bộ lọc -->
+        <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input ng-model="searchText" type="text" placeholder="Tìm kiếm mô tả..."
+                   class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+            <select ng-model="filterTrangThai" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+              <option value="">Tất cả trạng thái</option>
+              <option>Mới</option>
+              <option>Đang xử lý</option>
+              <option>Đã giải quyết</option>
+              <option>Đóng</option>
+            </select>
+            <select ng-model="filterMucDo" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+              <option value="">Tất cả mức độ</option>
+              <option>Thấp</option>
+              <option>Trung bình</option>
+              <option>Cao</option>
+              <option>Khẩn</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Bảng -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mã SC</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tài sản</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mô tả</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mức độ</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày báo cáo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="sc in listSuCo | filter:searchText | filter:{trangThai:filterTrangThai, mucDo:filterMucDo}" class="hover:bg-gray-50">
+                <td class="px-6 py-3">{{sc.maSuCo}}</td>
+                <td class="px-6 py-3">{{getTenTaiSan(sc.maTaiSan)}}</td>
+                <td class="px-6 py-3">{{sc.moTa}}</td>
+                <td class="px-6 py-3">
+                  <span class="px-2 py-1 text-xs font-semibold rounded-full"
+                        ng-class="{
+                          'bg-green-100 text-green-800': sc.mucDo=='Thấp',
+                          'bg-yellow-100 text-yellow-800': sc.mucDo=='Trung bình',
+                          'bg-orange-100 text-orange-800': sc.mucDo=='Cao',
+                          'bg-red-100 text-red-800': sc.mucDo=='Khẩn'
+                        }">{{sc.mucDo}}</span>
+                </td>
+                <td class="px-6 py-3">{{sc.ngayBaoCao | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td class="px-6 py-3">
+                  <span class="px-2 py-1 text-xs font-semibold rounded-full"
+                        ng-class="{
+                          'bg-purple-100 text-purple-800': sc.trangThai=='Mới',
+                          'bg-blue-100 text-blue-800': sc.trangThai=='Đang xử lý',
+                          'bg-green-100 text-green-800': sc.trangThai=='Đã giải quyết',
+                          'bg-gray-100 text-gray-800': sc.trangThai=='Đóng'
+                        }">{{sc.trangThai}}</span>
+                </td>
+                <td class="px-6 py-3">
+                  <button ng-click="edit(sc)" class="text-blue-600 hover:underline mr-2">Sửa</button>
+                  <button ng-click="xoa(sc.maSuCo)" class="text-red-600 hover:underline">Xóa</button>
+                </td>
+              </tr>
+              <tr ng-if="!listSuCo.length">
+                <td colspan="7" class="text-center py-6 text-gray-400">Không có dữ liệu</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="sucoModal" class="modal" ng-class="{'show': showModal}">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold">{{modalTitle}}</h3>
+        <button ng-click="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+      </div>
+
+      <form ng-submit="save()">
+        <div class="grid grid-cols-1 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Tài sản *</label>
+            <select ng-model="suco.maTaiSan" required class="w-full px-3 py-2 border border-gray-300 rounded">
+              <option value="">-- Chọn tài sản --</option>
+              <option ng-repeat="ts in listTaiSan" value="{{ts.maTaiSan}}">{{ts.tenTaiSan}}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Mô tả *</label>
+            <textarea ng-model="suco.moTa" required class="w-full px-3 py-2 border border-gray-300 rounded"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Mức độ *</label>
+            <select ng-model="suco.mucDo" class="w-full px-3 py-2 border border-gray-300 rounded">
+              <option>Thấp</option>
+              <option>Trung bình</option>
+              <option>Cao</option>
+              <option>Khẩn</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Trạng thái *</label>
+            <select ng-model="suco.trangThai" class="w-full px-3 py-2 border border-gray-300 rounded">
+              <option>Mới</option>
+              <option>Đang xử lý</option>
+              <option>Đã giải quyết</option>
+              <option>Đóng</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-6">
+          <button type="button" ng-click="closeModal()" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">Hủy</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="incidents.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

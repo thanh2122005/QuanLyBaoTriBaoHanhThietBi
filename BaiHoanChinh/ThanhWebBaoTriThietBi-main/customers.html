@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="vi" ng-app="AppQuanLyBaoTri">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quản lý Khách hàng</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <style>
+    .nav-link{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-radius:.5rem;color:#1f2937;font-weight:500;transition:.2s}
+    .nav-link:hover{background:#f1f5f9}
+    .nav-link.active{background:#e6f0ff;color:#1d4ed8;box-shadow:inset 2px 0 0 #3b82f6}
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:50}
+    .modal.active{display:flex!important}
+    .modal-content{background:#fff;border-radius:.75rem;padding:1.5rem;width:90%;max-width:650px}
+  </style>
+</head>
+
+<body class="bg-gray-50" ng-controller="KhachHangCtrl">
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <div class="p-4 border-b border-gray-200">
+        <h1 class="text-xl font-bold text-blue-600">Hệ thống Bảo trì</h1>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto p-4 space-y-1">
+         <a href="dashboard.html" class="nav-link">📊 Tổng quan</a>
+        <a href="assets.html" class="nav-link">🏢 Tài sản</a>
+        <a href="customers.html" class="nav-link active">👥 Khách hàng</a>
+        <a href="warranties.html" class="nav-link">🛡️ Bảo hành</a>
+        <a href="work-orders.html" class="nav-link">📋 Phiếu công việc</a>
+        <a href="schedules.html" class="nav-link">📅 Lịch bảo trì</a>
+        <a href="incidents.html" class="nav-link">⚠️ Sự cố</a>
+        <a href="inventory.html" class="nav-link">🔧 Kho linh kiện</a>
+        <a href="warehouse.html" class="nav-link">📦 Phiếu kho</a>
+        <a href="employees.html" class="nav-link">👨‍💼 Nhân viên</a>
+        <a href="roles.html" class="nav-link">🔐 Tài khoản</a>
+        <a href="checklists.html" class="nav-link ">✅ Checklist</a>
+        <a href="logs.html" class="nav-link">🧾 Nhật ký hệ thống</a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="p-6">
+
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">Quản lý Khách hàng</h2>
+
+          <div class="flex gap-3">
+            <!-- EXPORT -->
+            <button ng-click="exportExcel()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+              ⬇ Export Excel
+            </button>
+
+            <!-- IMPORT -->
+            <label class="px-4 py-2 bg-yellow-500 text-white rounded cursor-pointer hover:bg-yellow-600">
+              Import Excel
+              <input type="file" id="fileExcel" class="hidden"
+                onchange="angular.element(this).scope().importExcel()" />
+            </label>
+
+            <!-- ADD -->
+            <button ng-click="openModal()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+              + Thêm khách hàng
+            </button>
+          </div>
+        </div>
+
+        <!-- SEARCH -->
+        <div class="bg-white p-4 rounded-lg shadow mb-6">
+          <input ng-model="searchText" placeholder="Tìm kiếm khách hàng..."
+            class="w-full px-4 py-2 border border-gray-300 rounded">
+        </div>
+
+        <!-- TABLE -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3">Mã KH</th>
+                <th class="px-6 py-3">Tên khách hàng</th>
+                <th class="px-6 py-3">Điện thoại</th>
+                <th class="px-6 py-3">Email</th>
+                <th class="px-6 py-3">Địa chỉ</th>
+                <th class="px-6 py-3">Thao tác</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr ng-repeat="kh in listKhachHang | filter:searchText" class="hover:bg-gray-50">
+                <td class="px-6 py-3">{{kh.maKH}}</td>
+                <td class="px-6 py-3">{{kh.tenKH}}</td>
+                <td class="px-6 py-3">{{kh.dienThoai}}</td>
+                <td class="px-6 py-3">{{kh.email}}</td>
+                <td class="px-6 py-3">{{kh.diaChi}}</td>
+                <td class="px-6 py-3">
+                  <button ng-click="editKhachHang(kh)" class="text-blue-600 hover:underline">Sửa</button> |
+                  <button ng-click="deleteKhachHang(kh.maKH)" class="text-red-600 hover:underline">Xóa</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PAGING -->
+        <div class="flex justify-center gap-4 mt-6">
+          <button ng-click="prevPage()" ng-disabled="page <= 1"
+            class="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">⬅ Trước</button>
+
+          <span class="font-medium text-gray-700">Trang {{page}} / {{totalPages}}</span>
+
+          <button ng-click="nextPage()" ng-disabled="page >= totalPages"
+            class="px-4 py-2 bg-gray-200 rounded disabled:opacity-50">Tiếp ➡</button>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal" ng-class="{'active': showModal}">
+    <div class="modal-content">
+      <div class="flex justify-between mb-4">
+        <h3 class="text-xl font-bold">{{modalTitle}}</h3>
+        <button ng-click="closeModal()" class="text-gray-600 text-2xl">&times;</button>
+      </div>
+
+      <form ng-submit="saveKhachHang()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label>Tên khách hàng *</label>
+            <input ng-model="kh.tenKH" required class="w-full border px-3 py-2 rounded">
+          </div>
+          <div>
+            <label>Số điện thoại</label>
+            <input ng-model="kh.dienThoai" class="w-full border px-3 py-2 rounded">
+          </div>
+          <div>
+            <label>Email</label>
+            <input ng-model="kh.email" type="email" class="w-full border px-3 py-2 rounded">
+          </div>
+          <div class="md:col-span-2">
+            <label>Địa chỉ</label>
+            <textarea ng-model="kh.diaChi" class="w-full border px-3 py-2 rounded" rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-6">
+          <button type="button" ng-click="closeModal()" class="px-4 py-2 border rounded">Hủy</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Lưu</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <script src="customers.js"></script>
+
+</body>
+</html>

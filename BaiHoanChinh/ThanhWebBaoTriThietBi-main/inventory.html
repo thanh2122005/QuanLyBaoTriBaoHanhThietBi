@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi" ng-app="AppQuanLyBaoTri" ng-controller="InventoryCtrl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔧 Quản lý Kho Linh Kiện - Hệ thống Bảo trì</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <style>
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 500;
+      color: #1f2937;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-link:hover {
+      background-color: #f3f4f6;
+      color: #2563eb;
+    }
+    .nav-link.active {
+      background-color: #e0f2fe;
+      color: #2563eb;
+      font-weight: 600;
+      box-shadow: inset 2px 0 0 0 #2563eb;
+    }
+    .submenu {
+      transition: all 0.3s ease;
+    }
+    .hidden {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <div class="flex min-h-screen">
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <div class="p-6 border-b border-gray-200">
+        <h1 class="text-2xl font-bold text-blue-600">Hệ thống Bảo trì</h1>
+      </div>
+
+      <nav class="flex-1 p-4 overflow-y-auto space-y-1">
+        <a href="dashboard.html" class="nav-link">📊 Tổng quan</a>
+        <a href="assets.html" class="nav-link">🏢 Tài sản</a>
+        <a href="customers.html" class="nav-link">👥 Khách hàng</a>
+        <a href="warranties.html" class="nav-link">🛡️ Bảo hành</a>
+        <a href="work-orders.html" class="nav-link">📋 Phiếu công việc</a>
+        <a href="schedules.html" class="nav-link">📅 Lịch bảo trì</a>
+        <a href="incidents.html" class="nav-link">⚠️ Sự cố</a>
+        <a href="inventory.html" class="nav-link active">🔧 Kho linh kiện</a>
+
+        <!-- 📦 Phiếu kho -->
+        <div class="menu-group">
+          <a href="warehouse.html" onclick="openPhieuKhoMenu(event)" class="nav-link flex justify-between items-center">
+            📦 Phiếu kho
+            <span id="arrowPhieuKho" class="transform transition-transform duration-300">▾</span>
+          </a>
+          <div id="menuPhieuKho" class="submenu hidden ml-6 mt-1 bg-gray-50 rounded-lg p-2 space-y-1">
+            
+            <a href="warehouse-detail.html" class="block text-blue-600 hover:bg-blue-100 px-3 py-2 rounded">
+              Chi tiết phiếu kho
+            </a>
+          </div>
+        </div>
+
+        <a href="employees.html" class="nav-link">👨‍💼 Nhân viên</a>
+        <a href="roles.html" class="nav-link">🔐 Tài Khỏan</a>
+        <a href="checklists.html" class="nav-link">✅ Checklist</a>
+         <a href="logs.html" class="nav-link ">🧾 Nhật ký hệ thống</a>
+
+      </nav>
+
+      <div class="p-4 border-t border-gray-200">
+        <button onclick="logout()" class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 font-semibold transition">
+          Đăng xuất
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 overflow-y-auto p-8">
+      <h2 class="text-3xl font-bold mb-6 flex items-center gap-2">
+        🔧 Quản Lý Kho Linh Kiện
+      </h2>
+
+      <!-- Form -->
+      <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border border-gray-100">
+        <form ng-submit="save()" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div>
+            <label class="block text-sm font-medium mb-1">Tên linh kiện</label>
+            <input ng-model="linhKien.tenLinhKien" placeholder="Nhập tên linh kiện"
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Mã số</label>
+            <input ng-model="linhKien.maSo" placeholder="Nhập mã linh kiện"
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Tồn kho</label>
+            <input type="number" ng-model="linhKien.tonKho" placeholder="Số lượng tồn"
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div class="flex gap-2">
+            <button type="submit" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">💾 Lưu</button>
+            <button type="button" ng-click="search()" class="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">🔍 Tìm kiếm</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Table -->
+      <!-- Table -->
+<div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase">
+          Mã linh kiện
+        </th>
+        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase">
+          Tên linh kiện
+        </th>
+        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase">
+          Mã số
+        </th>
+        <th class="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase">
+          Tồn kho
+        </th>
+        <th class="px-6 py-3 text-center text-sm font-semibold text-gray-700 uppercase">
+          Thao tác
+        </th>
+      </tr>
+    </thead>
+
+    <tbody class="divide-y divide-gray-100">
+      <tr ng-repeat="lk in listLinhKien">
+        <td class="px-6 py-3 font-semibold text-gray-700">{{lk.maLinhKien}}</td>
+        <td class="px-6 py-3">{{lk.tenLinhKien}}</td>
+        <td class="px-6 py-3">{{lk.maSo}}</td>
+        <td class="px-6 py-3 text-right">{{lk.tonKho}}</td>
+        <td class="px-6 py-3 text-center">
+          <button ng-click="edit(lk)" class="text-yellow-600 hover:underline">Sửa</button> |
+          <button ng-click="delete(lk.maLinhKien)" class="text-red-600 hover:underline">Xóa</button>
+        </td>
+      </tr>
+
+      <tr ng-if="!listLinhKien.length">
+        <td colspan="5" class="text-center py-6 text-gray-500">Không có dữ liệu</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+  <script>
+    // Bấm "Phiếu kho" → mở menu + chuyển trang
+    function openPhieuKhoMenu(event) {
+      event.preventDefault();
+      const submenu = document.getElementById("menuPhieuKho");
+      const arrow = document.getElementById("arrowPhieuKho");
+      submenu.classList.remove("hidden");
+      arrow.classList.add("rotate-90");
+      setTimeout(() => (window.location.href = "warehouse.html"), 200);
+    }
+
+    function logout() {
+      if (confirm("Bạn có chắc muốn đăng xuất không?")) {
+        window.location.href = "login.html";
+      }
+    }
+  </script>
+
+  <script src="inventory.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

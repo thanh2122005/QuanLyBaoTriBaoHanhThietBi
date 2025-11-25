@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi" ng-app="AppQuanLyBaoTri" ng-controller="LoginCtrl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập - Hệ thống Bảo trì</title>
+
+  <base href="./">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <style>
+    body { background: #f3f4f6; }
+    .login-card {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 420px;
+    }
+  </style>
+</head>
+
+<body class="h-screen flex justify-center items-center">
+
+  <div class="login-card">
+    <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">
+      Đăng nhập hệ thống
+    </h2>
+
+    <form ng-submit="login()">
+
+      <label class="block mb-2 text-gray-700 font-medium">Tên đăng nhập</label>
+      <input type="text" ng-model="username" required
+             class="w-full mb-4 border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500">
+
+      <label class="block mb-2 text-gray-700 font-medium">Mật khẩu</label>
+
+      <!-- INPUT + ICON SVG KHÓA -->
+      <div class="relative mb-6">
+        <input id="passwordInput"
+               type="password"
+               ng-model="password"
+               required
+               class="w-full border rounded px-3 py-2 pr-12 focus:ring-2 focus:ring-blue-500">
+
+        <!-- ICON SVG KHÓA - CHÍNH GIỮA -->
+        <span id="togglePassword"
+              class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer select-none flex items-center">
+
+          <svg id="lockIcon" xmlns="http://www.w3.org/2000/svg"
+               fill="none" viewBox="0 0 24 24" stroke-width="2"
+               stroke="#2563eb" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M16 10V7a4 4 0 10-8 0v3m-2 0h12a2 2 0 012 2v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7a2 2 0 012-2z" />
+          </svg>
+
+        </span>
+      </div>
+
+      <button type="submit"
+              class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+        Đăng nhập
+      </button>
+    </form>
+
+    <p class="text-center mt-4">
+      <a href="forgot.html" class="text-blue-600 hover:underline">
+        Quên mật khẩu?
+      </a>
+    </p>
+
+    <p class="text-center text-gray-500 text-sm mt-4">
+      © 2025 - Hệ thống Quản lý Bảo trì
+    </p>
+  </div>
+
+  <!-- ========================================= -->
+  <!-- CODE ANGULARJS + HIỆN/ẨN MẬT KHẨU -->
+  <!-- ========================================= -->
+  <script>
+    // AngularJS App
+    var app = angular.module("AppQuanLyBaoTri", []);
+
+    app.controller("LoginCtrl", function ($scope, $http) {
+      const API_URL = "https://localhost:44310/api/TaiKhoan/get-all";
+
+      $scope.username = "";
+      $scope.password = "";
+
+      // Hàm đăng nhập
+      $scope.login = function () {
+        if (!$scope.username || !$scope.password) {
+          alert("⚠️ Vui lòng nhập tên đăng nhập và mật khẩu!");
+          return;
+        }
+
+        $http.get(API_URL).then(
+          function (res) {
+            const users = res.data || [];
+            const user = users.find(
+              (u) =>
+                u.tenDangNhap === $scope.username &&
+                u.matKhauHash === $scope.password
+            );
+
+            if (!user) {
+              alert("❌ Sai tên đăng nhập hoặc mật khẩu!");
+              return;
+            }
+
+            if (user.trangThai === "Khóa") {
+              alert("🔒 Tài khoản đã bị khóa!");
+              return;
+            }
+
+            localStorage.setItem("userLogin", JSON.stringify(user));
+            localStorage.setItem("userRole", user.role);
+            alert("✅ Đăng nhập thành công!");
+            window.location.href = "./dashboard.html";
+          },
+          function (err) {
+            console.error("❌ Lỗi:", err);
+            alert("❌ Không thể kết nối tới server!");
+          }
+        );
+      };
+    });
+
+    // ========================================
+    // HIỆN/ẨN MẬT KHẨU - CHẠY KHI HTML LOAD XONG
+    // ========================================
+    window.addEventListener("load", function() {
+      const toggleBtn = document.getElementById("togglePassword");
+      const inputPass = document.getElementById("passwordInput");
+      const iconLock = document.getElementById("lockIcon");
+
+      if (toggleBtn && inputPass && iconLock) {
+        toggleBtn.addEventListener("click", function () {
+          // Kiểm tra đang ẩn hay hiện
+          const isHidden = inputPass.type === "password";
+
+          if (isHidden) {
+            // Hiện mật khẩu
+            inputPass.type = "text";
+            // Icon mở khóa
+            iconLock.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M12 1v11m4-4H8m12 4v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7a2 2 0 012-2h12a2 2 0 012 2z"/>`;
+          } else {
+            // Ẩn mật khẩu
+            inputPass.type = "password";
+            // Icon khóa
+            iconLock.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M16 10V7a4 4 0 10-8 0v3m-2 0h12a2 2 0 012 2v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7a2 2 0 012-2z"/>`;
+          }
+
+          console.log("✅ Đã đổi type thành:", inputPass.type);
+        });
+      } else {
+        console.error("❌ Không tìm thấy element!");
+      }
+    });
+  </script>
+
+</body>
+</html>

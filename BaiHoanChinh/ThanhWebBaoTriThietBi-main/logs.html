@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi" ng-app="AppQuanLyBaoTri" ng-controller="LogCtrl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nhật ký hệ thống - Hệ thống Bảo trì</title>
+
+  <!-- Tailwind + AngularJS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <style>
+    .nav-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: 8px;
+      font-weight: 500; color: #374151;
+      transition: all 0.2s ease; text-decoration: none;
+    }
+    .nav-link:hover { background-color: #f3f4f6; color: #2563eb; }
+    .nav-link.active {
+      background-color: #e0f2fe; color: #2563eb; font-weight: 600;
+      box-shadow: inset 2px 0 0 0 #2563eb;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <div class="flex min-h-screen">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <div class="p-6 border-b border-gray-200">
+        <h1 class="text-2xl font-bold text-blue-600">Hệ thống Bảo trì</h1>
+      </div>
+
+      <nav class="flex-1 p-4 overflow-y-auto space-y-1">
+        <a href="dashboard.html" class="nav-link">📊 Tổng quan</a>
+        <a href="assets.html" class="nav-link">🏢 Tài sản</a>
+        <a href="customers.html" class="nav-link">👥 Khách hàng</a>
+        <a href="warranties.html" class="nav-link">🛡️ Bảo hành</a>
+        <a href="work-orders.html" class="nav-link">📋 Phiếu công việc</a>
+        <a href="schedules.html" class="nav-link">📅 Lịch bảo trì</a>
+        <a href="incidents.html" class="nav-link">⚠️ Sự cố</a>
+        <a href="inventory.html" class="nav-link">🔧 Kho linh kiện</a>
+        <a href="warehouse.html" class="nav-link">📦 Phiếu kho</a>
+        <a href="employees.html" class="nav-link">👨‍💼 Nhân viên</a>
+        <a href="roles.html" class="nav-link">🔐 Tài Khoản</a>
+        <a href="checklists.html" class="nav-link">✅ Checklist</a>
+        <a href="logs.html" class="nav-link active">🧾 Nhật ký hệ thống</a>
+      </nav>
+
+      <div class="p-4 border-t border-gray-200">
+        <button id="logoutBtn"
+          class="w-full py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded transition">
+          Đăng xuất
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-y-auto p-8">
+
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold text-gray-800">🧾 Nhật ký hệ thống</h2>
+        <button ng-click="loadLogs()"
+                class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">
+          🔄 Làm mới
+        </button>
+      </div>
+
+      <!-- Bộ lọc -->
+      <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+        <h3 class="text-lg font-semibold mb-4">Tìm kiếm & Lọc</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <!-- Ô tìm -->
+          <input ng-model="searchText" type="text"
+                 placeholder="🔍 Tìm theo bảng, hành động, người sửa..."
+                 class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+
+          <!-- Lọc hành động -->
+          <select ng-model="filterAction"
+                  class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+            <option value="">Tất cả hành động</option>
+            <option>Thêm</option>
+            <option>Sửa</option>
+            <option>Xóa</option>
+          </select>
+
+          <!-- Lọc người dùng -->
+          <select ng-model="filterUser"
+                  class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+            <option value="">Tất cả người sửa</option>
+            <option ng-repeat="u in uniqueUsers">{{u}}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Bảng nhật ký -->
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">STT</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bảng</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hành động</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Người thực hiện</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thời gian</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Chi tiết</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="log in logs | filter:filterLogs track by $index" class="hover:bg-gray-50">
+              
+              <td class="px-6 py-3 text-sm">{{$index + 1 + ((page-1) * pageSize)}}</td>
+              <td class="px-6 py-3 text-sm font-medium">{{log.tenBang}}</td>
+
+              <td class="px-6 py-3 text-sm">
+                <span ng-class="{
+                  'bg-green-100 text-green-700': log.hanhDong == 'Thêm',
+                  'bg-yellow-100 text-yellow-700': log.hanhDong == 'Sửa',
+                  'bg-red-100 text-red-700': log.hanhDong == 'Xóa'
+                }"
+                class="px-2 py-1 rounded-full text-xs font-semibold">
+                {{log.hanhDong}}
+                </span>
+              </td>
+
+              <td class="px-6 py-3 text-sm">{{log.thayDoiBoi}}</td>
+
+              <td class="px-6 py-3 text-sm text-gray-600">
+                {{log.thoiGian | date:'dd/MM/yyyy HH:mm:ss'}}
+              </td>
+
+              <td class="px-6 py-3">
+                <button ng-click="showDetail(log)" class="text-blue-600 hover:underline">Xem</button>
+              </td>
+            </tr>
+
+            <tr ng-if="logs.length === 0">
+              <td colspan="6" class="text-center text-gray-400 py-6">Không có dữ liệu nhật ký</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PHÂN TRANG -->
+      <div class="flex justify-between items-center mt-6">
+        <button ng-click="changePage(page - 1)"
+                ng-disabled="page == 1"
+                class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-40">
+          ⬅ Trang trước
+        </button>
+
+        <span class="text-gray-700 font-medium">
+          Trang {{page}} / {{totalPages}}
+        </span>
+
+        <button ng-click="changePage(page + 1)"
+                ng-disabled="page == totalPages"
+                class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-40">
+          Trang sau ➡
+        </button>
+      </div>
+
+      <!-- Modal Chi tiết -->
+      <div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center"
+           ng-show="showModal">
+
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl shadow-lg">
+          <h3 class="text-xl font-bold mb-3 text-blue-700">📋 Chi tiết thay đổi</h3>
+
+          <p><b>Bảng:</b> {{selectedLog.tenBang}}</p>
+          <p><b>Hành động:</b> {{selectedLog.hanhDong}}</p>
+          <p><b>Người thực hiện:</b> {{selectedLog.thayDoiBoi}}</p>
+          <p><b>Thời gian:</b> {{selectedLog.thoiGian | date:'dd/MM/yyyy HH:mm:ss'}}</p>
+
+          <div class="grid grid-cols-2 gap-4 mt-4">
+            <div>
+              <h4 class="font-semibold text-red-600">Giá trị cũ</h4>
+              <pre class="bg-gray-100 rounded p-2 text-sm overflow-auto">{{selectedLog.giaTriCu || '—'}}</pre>
+            </div>
+
+            <div>
+              <h4 class="font-semibold text-green-600">Giá trị mới</h4>
+              <pre class="bg-gray-100 rounded p-2 text-sm overflow-auto">{{selectedLog.giaTriMoi || '—'}}</pre>
+            </div>
+          </div>
+
+          <div class="flex justify-end mt-5">
+            <button ng-click="closeModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">
+              Đóng
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="logs.js"></script>
+  <script src="auth.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi" ng-app="ForgotApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quên mật khẩu</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+
+<body class="bg-gray-100 flex justify-center items-center h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md" ng-controller="ForgotCtrl">
+
+    <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">
+      🔐 Quên mật khẩu
+    </h2>
+
+    <!-- Bước 1: Nhập Email -->
+    <div ng-show="step === 1">
+      <label>Email đăng ký</label>
+      <input type="email" ng-model="email"
+             class="w-full border px-3 py-2 rounded mt-1 mb-4" placeholder="Nhập email của bạn">
+
+      <button ng-click="sendOtp()"
+              class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+        Gửi mã OTP
+      </button>
+    </div>
+
+    <!-- Bước 2: Nhập OTP -->
+    <div ng-show="step === 2">
+      <p class="text-gray-700 mb-3">Mã OTP đã gửi đến email <b>{{email}}</b></p>
+
+      <label>Nhập OTP</label>
+      <input type="text" ng-model="otp"
+             class="w-full border px-3 py-2 rounded mt-1 mb-4"
+             maxlength="6" placeholder="6 số OTP">
+
+      <button ng-click="verifyOtp()"
+              class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
+        Xác minh OTP
+      </button>
+
+      <button ng-click="step = 1"
+              class="w-full mt-2 bg-gray-300 py-2 rounded">
+        Quay lại
+      </button>
+    </div>
+
+    <!-- Bước 3: Nhập mật khẩu mới -->
+    <div ng-show="step === 3">
+      <label>Mật khẩu mới</label>
+      <input type="password" ng-model="newPassword"
+             class="w-full border px-3 py-2 rounded mt-1 mb-4"
+             placeholder="Nhập mật khẩu mới">
+
+      <button ng-click="resetPassword()"
+              class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700">
+        Đổi mật khẩu
+      </button>
+    </div>
+
+    <p class="text-center mt-4">
+      <a href="login.html" class="text-blue-600">Quay lại đăng nhập</a>
+    </p>
+
+  </div>
+
+  <script src="forgot.js"></script>
+
+</body>
+</html>

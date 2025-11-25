@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi" ng-app="AppQuanLyBaoTri">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lịch Bảo trì - Hệ thống Bảo trì</title>
+
+  <!-- Tailwind & AngularJS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <style>
+    .nav-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: 8px;
+      font-weight: 500; color: #374151;
+      transition: all 0.2s ease;
+    }
+    .nav-link:hover { background-color: #f3f4f6; }
+    .nav-link.active {
+      background-color: #e0f2fe; color: #2563eb; font-weight: 600;
+      box-shadow: inset 0 0 0 1px #bfdbfe;
+    }
+    .modal {
+      display: none; position: fixed; inset: 0;
+      z-index: 50; background: rgba(0, 0, 0, 0.5);
+      justify-content: center; align-items: center;
+    }
+    .modal.show { display: flex; }
+    .modal-content {
+      background: white; border-radius: 0.75rem;
+      padding: 1.5rem; width: 90%; max-width: 600px;
+      max-height: 90vh; overflow-y: auto;
+    }
+  </style>
+</head>
+
+<body ng-controller="LichBaoTriCtrl" class="bg-gray-50">
+
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <div class="p-6 border-b border-gray-200">
+        <h1 class="text-2xl font-bold text-blue-600">Hệ thống Bảo trì</h1>
+      </div>
+
+      <nav class="flex-1 p-4 overflow-y-auto space-y-1">
+        <a href="dashboard.html" class="nav-link">📊 Tổng quan</a>
+        <a href="assets.html" class="nav-link">🏢 Tài sản</a>
+        <a href="customers.html" class="nav-link">👥 Khách hàng</a>
+        <a href="warranties.html" class="nav-link">🛡️ Bảo hành</a>
+        <a href="work-orders.html" class="nav-link">📋 Phiếu công việc</a>
+        <a href="schedules.html" class="nav-link active">📅 Lịch bảo trì</a>
+        <a href="incidents.html" class="nav-link">⚠️ Sự cố</a>
+        <a href="inventory.html" class="nav-link">🔧 Kho linh kiện</a>
+        <a href="warehouse.html" class="nav-link">📦 Phiếu kho</a>
+        <a href="employees.html" class="nav-link">👨‍💼 Nhân viên</a>
+        <a href="roles.html" class="nav-link">🔐 Tài khoản</a>
+        <a href="checklists.html" class="nav-link">✅ Checklist</a>
+        <a href="logs.html" class="nav-link">🧾 Nhật ký hệ thống</a>
+      </nav>
+
+      <div class="p-4 border-t border-gray-200">
+        <button ng-click="logout()" class="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">
+          Đăng xuất
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="p-8">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">Quản lý Lịch Bảo trì</h2>
+          <button ng-click="OpenModal()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+            + Thêm lịch bảo trì
+          </button>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mã lịch</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tài sản</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nhân viên</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tần suất</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày kế tiếp</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hiệu lực</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr ng-repeat="l in listLichBaoTri" class="hover:bg-gray-50">
+                <td class="px-6 py-4 text-sm">{{l.MaLich}}</td>
+                <td class="px-6 py-4 text-sm">{{l.tenTaiSan}}</td>
+                <td class="px-6 py-4 text-sm">{{l.tenNhanVien}}</td>
+
+                <td class="px-6 py-4 text-sm">{{l.TanSuat}} ({{l.SoNgayLapLai}} ngày)</td>
+
+                <td class="px-6 py-4 text-sm">{{l.NgayKeTiep | date:'dd/MM/yyyy'}}</td>
+
+                <td class="px-6 py-4 text-sm">
+                  <span ng-class="{'text-green-600': l.HieuLuc, 'text-gray-400': !l.HieuLuc}">
+                    {{l.HieuLuc ? 'Còn hiệu lực' : 'Ngừng'}}
+                  </span>
+                </td>
+
+                <td class="px-6 py-4 text-blue-600">
+                  <button ng-click="EditLich(l)" class="hover:underline">Sửa</button> |
+                  <button ng-click="DeleteLich(l.MaLich)" class="hover:underline text-red-600">Xóa</button>
+                </td>
+              </tr>
+
+              <tr ng-if="!listLichBaoTri.length">
+                <td colspan="7" class="text-center py-6 text-gray-400">Không có dữ liệu</td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" ng-class="{'show': showModal}">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold">{{modalTitle}}</h3>
+        <button ng-click="CloseModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+      </div>
+
+      <form ng-submit="SaveLich()">
+        <div class="grid grid-cols-2 gap-4">
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Tài sản</label>
+            <select ng-model="lich.MaTaiSan"
+                    ng-options="t.maTaiSan as t.tenTaiSan for t in listTaiSan"
+                    class="border rounded px-3 py-2 w-full"></select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Nhân viên</label>
+            <select ng-model="lich.MaNV"
+                    ng-options="n.maNV as n.hoTen for n in listNhanVien"
+                    class="border rounded px-3 py-2 w-full">
+              <option value="">-- Không gán --</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Tần suất</label>
+            <input ng-model="lich.TanSuat" class="border rounded px-3 py-2 w-full" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Số ngày lặp lại</label>
+            <input type="number" ng-model="lich.SoNgayLapLai" class="border rounded px-3 py-2 w-full" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Ngày kế tiếp</label>
+            <input type="date" ng-model="lich.NgayKeTiep" class="border rounded px-3 py-2 w-full" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Hiệu lực</label>
+            <select ng-model="lich.HieuLuc" class="border rounded px-3 py-2 w-full">
+              <option value="true">Còn hiệu lực</option>
+              <option value="false">Ngừng</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="mt-6 flex justify-end gap-2">
+          <button type="button" ng-click="CloseModal()" class="px-4 py-2 border rounded hover:bg-gray-100">Hủy</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Lưu</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script src="schedules.js"></script>
+</body>
+</html>

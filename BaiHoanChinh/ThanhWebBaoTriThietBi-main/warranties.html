@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi" ng-app="AppQuanLyBaoTri" ng-controller="WarrantyCtrl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Bảo hành - Hệ thống Bảo trì</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <style>
+    .nav-link{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;font-weight:500;color:#374151;transition:all .2s;text-decoration:none}
+    .nav-link:hover{background:#f3f4f6;color:#2563eb}
+    .nav-link.active{background:#e0f2fe;color:#2563eb;font-weight:600;box-shadow:inset 2px 0 0 0 #2563eb}
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:50}
+    .modal.show{display:flex}
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <div class="p-6 border-b border-gray-200">
+        <h1 class="text-2xl font-bold text-blue-600">Hệ thống Bảo trì</h1>
+      </div>
+      <nav class="flex-1 p-4 overflow-y-auto space-y-1">
+        <a href="dashboard.html" class="nav-link">📊 Tổng quan</a>
+        <a href="assets.html" class="nav-link">🏢 Tài sản</a>
+        <a href="customers.html" class="nav-link">👥 Khách hàng</a>
+        <a href="warranties.html" class="nav-link active">🛡️ Bảo hành</a>
+        <a href="work-orders.html" class="nav-link">📋 Phiếu công việc</a>
+        <a href="schedules.html" class="nav-link">📅 Lịch bảo trì</a>
+        <a href="incidents.html" class="nav-link">⚠️ Sự cố</a>
+        <a href="inventory.html" class="nav-link">🔧 Kho linh kiện</a>
+        <a href="warehouse.html" class="nav-link">📦 Phiếu kho</a>
+        <a href="employees.html" class="nav-link">👨‍💼 Nhân viên</a>
+        <a href="roles.html" class="nav-link">🔐 Tài Khoản</a>
+        <a href="checklists.html" class="nav-link">✅ Checklist</a>
+        <a href="logs.html" class="nav-link ">🧾 Nhật ký hệ thống</a>
+        
+
+
+      </nav>
+       <!-- 🔴 Nút Đăng xuất -->
+      <div class="p-4 border-t border-gray-200">
+        <button id="logoutBtn"
+          class="w-full py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded transition">
+          Đăng xuất
+        </button>
+      </div>
+    </aside>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="p-8">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">Quản lý Bảo hành</h2>
+          <button ng-click="openModal()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+            + Thêm bảo hành
+          </button>
+        </div>
+
+        <!-- Search + Filter -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6 flex flex-col md:flex-row gap-4">
+          <input type="text" ng-model="searchText" placeholder="Tìm kiếm bảo hành..." class="flex-1 px-4 py-2 border rounded-lg">
+          <select ng-model="statusFilter" ng-change="filterByStatus()" class="px-4 py-2 border rounded-lg">
+            <option value="all">Tất cả</option>
+            <option value="Còn hạn">Còn hạn</option>
+            <option value="Sắp hết hạn">Sắp hết hạn</option>
+            <option value="Hết hạn">Hết hạn</option>
+          </select>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mã BH</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tài sản</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nhà cung cấp</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày bắt đầu</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày kết thúc</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="w in warranties | filter:searchText">
+                <td class="px-6 py-3">{{w.maBaoHanh}}</td>
+                <td class="px-6 py-3">{{w.tenTaiSan || w.maTaiSan}}</td>
+                <td class="px-6 py-3">{{w.nhaCungCap}}</td>
+                <td class="px-6 py-3">{{w.ngayBatDau | date:'dd/MM/yyyy'}}</td>
+                <td class="px-6 py-3">{{w.ngayKetThuc | date:'dd/MM/yyyy'}}</td>
+                <td class="px-6 py-3 font-semibold" ng-class="getStatusColor(w.ngayKetThuc)">
+                  {{getWarrantyStatus(w.ngayKetThuc)}}
+                </td>
+                <td class="px-6 py-3">
+                  <button ng-click="viewWarranty(w)" class="text-blue-600 hover:underline">Xem</button> |
+                  <button ng-click="editWarranty(w)" class="text-yellow-600 hover:underline">Sửa</button> |
+                  <button ng-click="deleteWarranty(w.maBaoHanh)" class="text-red-600 hover:underline">Xóa</button>
+                </td>
+              </tr>
+              <tr ng-if="!warranties.length">
+                <td colspan="7" class="text-center py-6 text-gray-500">Không có dữ liệu</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="warrantyModal" class="modal" ng-class="{'show': showModal}">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold">{{modalTitle}}</h3>
+        <button ng-click="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+      </div>
+      <form ng-submit="saveWarranty()">
+        <div class="space-y-3">
+          <div>
+            <label class="block text-sm mb-1">Tài sản *</label>
+            <select ng-model="warranty.maTaiSan" class="w-full border rounded px-3 py-2" required>
+              <option ng-repeat="a in assets" value="{{a.maTaiSan}}">{{a.tenTaiSan}}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Nhà cung cấp *</label>
+            <input ng-model="warranty.nhaCungCap" class="w-full border rounded px-3 py-2" required>
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Ngày bắt đầu *</label>
+            <input type="date" ng-model="warranty.ngayBatDau" class="w-full border rounded px-3 py-2" required>
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Ngày kết thúc *</label>
+            <input type="date" ng-model="warranty.ngayKetThuc" class="w-full border rounded px-3 py-2" required>
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Điều khoản</label>
+            <textarea ng-model="warranty.dieuKhoan" class="w-full border rounded px-3 py-2"></textarea>
+          </div>
+        </div>
+        <div class="flex gap-3 pt-4">
+          <button type="button" ng-click="closeModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400">Hủy</button>
+          <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="warranties.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>
